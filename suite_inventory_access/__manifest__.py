@@ -39,8 +39,8 @@ Safe to install and uninstall at any time.
     'website': 'https://suitestate.com',
     'license': 'LGPL-3',
     'depends': [
+        'sale',
         'stock',
-        'sales_team',
     ],
     'data': [
         'security/inventory_access_groups.xml',

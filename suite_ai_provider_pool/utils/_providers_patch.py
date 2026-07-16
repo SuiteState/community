@@ -19,10 +19,13 @@ ANTHROPIC = Provider(
     embedding_model="",
     embedding_config={},
     llms=[
+        ("claude-opus-4-8", "Claude Opus 4.8"),
         ("claude-opus-4-7", "Claude Opus 4.7"),
+        ("claude-opus-4-6", "Claude Opus 4.6"),
         ("claude-sonnet-4-6", "Claude Sonnet 4.6"),
         ("claude-haiku-4-5", "Claude Haiku 4.5"),
     ],
+    deprecated_models=[],
 )
 
 DEEPSEEK = Provider(
@@ -34,6 +37,7 @@ DEEPSEEK = Provider(
         ("deepseek-chat", "DeepSeek V3 (Chat)"),
         ("deepseek-reasoner", "DeepSeek R1 (Reasoner)"),
     ],
+    deprecated_models=[],
 )
 
 # Curated defaults for Self-Hosted. Tags follow the conventions of Ollama,
@@ -41,9 +45,12 @@ DEEPSEEK = Provider(
 # through AI Settings (see ``suite_selfhosted_models``).
 SELFHOSTED_DEFAULT_MODELS = [
     ("llama3.3:70b", "Llama 3.3 70B"),
-    ("qwen2.5:14b", "Qwen 2.5 14B"),
+    ("qwen3:32b", "Qwen3 32B"),
     ("qwen2.5:72b", "Qwen 2.5 72B"),
+    ("deepseek-v3", "DeepSeek V3 (self-hosted)"),
     ("deepseek-r1", "DeepSeek R1 (self-hosted)"),
+    ("gpt-oss:120b", "GPT-OSS 120B"),
+    ("gpt-oss:20b", "GPT-OSS 20B"),
     ("mistral-small", "Mistral Small"),
     ("gemma3:27b", "Gemma 3 27B"),
     ("phi4", "Phi-4"),
@@ -55,6 +62,7 @@ SELFHOSTED = Provider(
     embedding_model="",
     embedding_config={},
     llms=list(SELFHOSTED_DEFAULT_MODELS),
+    deprecated_models=[],
 )
 
 

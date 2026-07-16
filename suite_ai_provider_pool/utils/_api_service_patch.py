@@ -71,6 +71,12 @@ _SELFHOSTED_URL_PARAM = "ai.selfhosted_url"
 _ANTHROPIC_VERSION = "2023-06-01"
 _DEFAULT_MAX_TOKENS = 4096
 
+# Sampling parameters that newer Anthropic models (Opus 4.7+, Fable 5) reject
+# with a 400. We send temperature by default; if the API refuses it we strip
+# these and retry once. Model-agnostic on purpose (keyed on the API's own 400,
+# not a hardcoded model list) so future models are handled without changes.
+_SAMPLING_KEYS = ("temperature", "top_p", "top_k")
+
 
 def normalize_selfhosted_url(raw):
     """Best-effort normalization of a user-entered server URL: strip
@@ -278,19 +284,38 @@ def _request_llm_anthropic(
         return response, to_call, next_inputs
 
 
-def _request_llm_anthropic_helper(self, body, inputs=()):
+def _post_anthropic(self, body):
+    """POST to /messages, transparently stripping sampling params on refusal.
+
+    Newer Anthropic models (Opus 4.7+, Fable 5) reject temperature/top_p/top_k
+    with a 400. On such a 400 we drop those keys and retry once, so the same
+    transport works for models that accept sampling params (Sonnet/Haiku, older
+    Opus) and those that don't — without a per-model branch. Returns the
+    ``requests`` response; raising for status is left to the caller."""
     headers = {
         "x-api-key": self._get_api_token(),
         "anthropic-version": _ANTHROPIC_VERSION,
         "Content-Type": "application/json",
     }
+    resp = requests.post(
+        f"{self.base_url}/messages", headers=headers, json=body, timeout=120,
+    )
+    if resp.status_code == 400 and any(k in body for k in _SAMPLING_KEYS):
+        try:
+            message = resp.json().get("error", {}).get("message") or ""
+        except ValueError:
+            message = resp.text or ""
+        if any(k in message for k in _SAMPLING_KEYS):
+            body = {k: v for k, v in body.items() if k not in _SAMPLING_KEYS}
+            resp = requests.post(
+                f"{self.base_url}/messages", headers=headers, json=body, timeout=120,
+            )
+    return resp
+
+
+def _request_llm_anthropic_helper(self, body, inputs=()):
     try:
-        resp = requests.post(
-            f"{self.base_url}/messages",
-            headers=headers,
-            json=body,
-            timeout=120,
-        )
+        resp = self._post_anthropic(body)
         resp.raise_for_status()
     except requests.RequestException as exc:
         error = repr(exc)
@@ -334,6 +359,7 @@ def _request_llm_anthropic_helper(self, body, inputs=()):
     return response, to_call, next_inputs, request_token_usage
 
 
+LLMApiService._post_anthropic = _post_anthropic
 LLMApiService._request_llm_anthropic = _request_llm_anthropic
 LLMApiService._request_llm_anthropic_helper = _request_llm_anthropic_helper
 

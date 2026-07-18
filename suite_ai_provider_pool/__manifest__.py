@@ -1,5 +1,5 @@
 {
-    "name": "AI Provider Pool: Claude, DeepSeek, Self-Hosted",
+    "name": "AI Provider Pool",
     "summary": "Anthropic Claude, DeepSeek, Ollama, vLLM, LM Studio — add any LLM as a native Odoo 19 AI provider with tool calling, embedding fallback, AI automation model, self-hosted OpenAI-compatible endpoint, one-click model discovery.",
     "description": """
 Keywords: AI provider, Claude provider, DeepSeek provider, Ollama Odoo,
@@ -63,7 +63,7 @@ Limitations
 
 License: LGPL-3.
 """,
-    "version": "19.0.1.3.0",
+    "version": "19.0.1.3.1",
     "category": "Productivity/AI",
     "license": "LGPL-3",
     "author": "SuiteState",

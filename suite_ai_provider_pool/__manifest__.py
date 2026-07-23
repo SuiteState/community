@@ -16,7 +16,7 @@ the AI Agent model selector alongside OpenAI and Google Gemini.
 
 Providers
 ---------
-- Anthropic Claude (Messages API) with tool calling.
+- Anthropic Claude (Messages API) with tool calling and web search.
 - DeepSeek (Chat Completions API) with function calling.
 - Self-Hosted OpenAI-compatible servers (Ollama, vLLM, LM Studio,
   HuggingFace TGI, or any endpoint exposing /v1/chat/completions),
@@ -45,6 +45,14 @@ Google). The user simply needs one embedding-capable key alongside
 their chat key. If neither is configured, a clear error message
 directs the user to Settings > AI.
 
+Web Search (Anthropic)
+----------------------
+When a caller requests web grounding, Anthropic Claude answers using
+its server-side web search tool, so the AI can use up-to-date public
+information. The tool version is matched to the model automatically
+(dynamic filtering on Claude 4.6+, basic on older models). DeepSeek and
+self-hosted models do not offer web search and reject the request.
+
 AI Automation Model
 -------------------
 Native Odoo 19 hardcodes OpenAI GPT-4.1 for all AI-powered server
@@ -55,18 +63,20 @@ all AI automations.
 
 Limitations
 -----------
-- File attachments, structured output (JSON schema) and web grounding
-  are not supported for the new providers. Use OpenAI or Gemini for
-  those capabilities.
+- File attachments and structured output (JSON schema) are not
+  supported for the new providers. Use OpenAI or Gemini for those.
+- Web grounding (web search) is supported for Anthropic Claude only;
+  DeepSeek and self-hosted models do not offer a web search tool.
 - AI Field Fill remains OpenAI-only due to Odoo's use of the
   /responses endpoint, which other providers do not support yet.
 
 License: LGPL-3.
 """,
-    "version": "19.0.1.3.1",
+    "version": "19.0.1.4.1",
     "category": "Productivity/AI",
     "license": "LGPL-3",
     "author": "SuiteState",
+    "support": "hello@suitestate.com",
     "website": "https://suitestate.com",
     "depends": ["ai_app"],
     "data": [

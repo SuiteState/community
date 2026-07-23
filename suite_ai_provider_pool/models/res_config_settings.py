@@ -93,10 +93,14 @@ class ResConfigSettings(models.TransientModel):
         string="AI Automation Model",
         config_parameter="suite_ai_provider_pool.server_action_model",
         help=(
-            "LLM model used by AI-powered server actions (automations, "
-            "document sorting, etc.). If empty, defaults to GPT-4.1 "
-            "(native Odoo behaviour). Set this to use Claude, DeepSeek, "
-            "or a self-hosted model for all AI automations."
+            "Which model runs Odoo's built-in AI automations — a server "
+            "action or automation rule flagged 'AI', document "
+            "auto-classification, and similar. These are NOT the chatbot: "
+            "AI Agents and the WhatsApp AI each pick their own model on "
+            "their own record and are unaffected by this. Odoo hardcodes "
+            "these automations to OpenAI GPT-4.1 — set this to run them on "
+            "Claude, DeepSeek or a self-hosted model instead. Leave empty "
+            "to keep the GPT-4.1 default (requires an OpenAI key)."
         ),
     )
 

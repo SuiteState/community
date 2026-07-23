@@ -38,6 +38,7 @@ See the app's listing page for full documentation, screenshots, supported
 chat surfaces, privacy details, and configuration options.
     """,
     'author': 'SuiteState',
+    'support': 'hello@suitestate.com',
     'maintainer': 'ElectroState FZCO',
     'website': 'https://suitestate.com',
     'license': 'LGPL-3',

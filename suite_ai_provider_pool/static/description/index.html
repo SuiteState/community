@@ -22,8 +22,8 @@ no separate configuration page.
 
 <h3>Anthropic Claude</h3>
 <p>
-Full Messages API integration with tool calling. Supports Claude
-Opus, Sonnet, and Haiku models. API key configured per database
+Full Messages API integration with tool calling and server-side
+web search. Supports Claude Opus, Sonnet, and Haiku models. API key configured per database
 in Settings &rarr; AI, or via the <code>ODOO_AI_ANTHROPIC_TOKEN</code>
 environment variable.
 </p>
@@ -236,9 +236,9 @@ described above.
             <td style="padding:10px 12px; border:1px solid #ddd;">Requires provider-specific response format</td>
         </tr>
         <tr>
-            <td style="padding:10px 12px; border:1px solid #ddd;">Web grounding</td>
-            <td style="padding:10px 12px; border:1px solid #ddd;">OpenAI / Gemini only</td>
-            <td style="padding:10px 12px; border:1px solid #ddd;">Requires provider-specific search integration</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Web grounding (web search)</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Claude / OpenAI / Gemini</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Claude uses its server-side web search, version-matched to the model. DeepSeek and self-hosted models offer no web search tool.</td>
         </tr>
     </tbody>
 </table>

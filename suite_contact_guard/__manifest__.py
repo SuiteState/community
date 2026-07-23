@@ -25,6 +25,7 @@ Built and used at SuiteState. Open-sourced under LGPL-3. See the
 app's listing page for full documentation.
     """,
     'author': 'SuiteState',
+    'support': 'hello@suitestate.com',
     'website': 'https://suitestate.com',
     'license': 'LGPL-3',
     'depends': [

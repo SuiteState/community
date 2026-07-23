@@ -93,14 +93,11 @@ class ResConfigSettings(models.TransientModel):
         string="AI Automation Model",
         config_parameter="suite_ai_provider_pool.server_action_model",
         help=(
-            "Which model runs Odoo's built-in AI automations — a server "
-            "action or automation rule flagged 'AI', document "
-            "auto-classification, and similar. These are NOT the chatbot: "
-            "AI Agents and the WhatsApp AI each pick their own model on "
-            "their own record and are unaffected by this. Odoo hardcodes "
-            "these automations to OpenAI GPT-4.1 — set this to run them on "
-            "Claude, DeepSeek or a self-hosted model instead. Leave empty "
-            "to keep the GPT-4.1 default (requires an OpenAI key)."
+            "Model for Odoo's built-in AI automations (server actions / "
+            "rules flagged 'AI', document sorting) — NOT the chatbot; AI "
+            "Agents and the WhatsApp AI keep their own model. Odoo defaults "
+            "to OpenAI GPT-4.1; set this to use Claude, DeepSeek or "
+            "self-hosted. Leave empty to keep the default (needs an OpenAI key)."
         ),
     )
 

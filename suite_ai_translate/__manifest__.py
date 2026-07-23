@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Bidirectional AI Translate',
-    'version': '19.0.1.2.3',
+    'version': '19.0.1.2.4',
     'category': 'Productivity/Discuss',
     'summary': 'Bidirectional real-time AI translation for Discuss, WhatsApp, and chatter conversations. Two-way translation for multilingual customer support.',
     'description': """
@@ -31,8 +31,12 @@ Other capabilities:
 - No author/recipient names, attachments, or record context transmitted to
   the AI provider -- only the text being translated and the target language.
 
-Powered by Odoo 19's native AI framework. Reuses the OpenAI or Google Gemini
-API key already configured in Odoo's AI settings.
+Powered by Odoo 19's native AI framework. The model dropdown is built from
+Odoo's AI provider registry, so every registered provider is selectable --
+OpenAI and Google Gemini out of the box, plus Anthropic Claude, DeepSeek and
+self-hosted models when a provider add-on such as the free AI Provider Pool is
+installed. Reuses whatever key is already configured in Odoo's AI settings; the
+module bundles none of its own.
 
 See the app's listing page for full documentation, screenshots, supported
 chat surfaces, privacy details, and configuration options.

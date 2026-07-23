@@ -20,8 +20,11 @@
 </ul>
 <p>
     Translation is performed by the AI provider configured in Odoo's
-    native <code>ai</code> module &mdash; currently OpenAI or Google Gemini.
-    The module does not require its own API key or SaaS account.
+    native <code>ai</code> module. The model dropdown is built from that
+    registry, so any registered provider is selectable: OpenAI and Google
+    Gemini out of the box, and Anthropic Claude, DeepSeek or self-hosted
+    models when a provider add-on such as the free <em>AI Provider Pool</em>
+    is installed. The module does not require its own API key or SaaS account.
 </p>
 
 <hr/>
@@ -92,9 +95,9 @@
 
 <h2>Data transmission &amp; privacy</h2>
 <p>
-    This module transmits message text to a third-party AI provider
-    (OpenAI or Google Gemini, depending on configuration) over
-    HTTPS for the sole purpose of translation. Review this section
+    This module transmits message text to the third-party AI provider
+    you configure over HTTPS for the sole purpose of translation. Review
+    this section
     and ensure compliance with applicable data handling policies
     before enabling the feature.
 </p>
@@ -177,19 +180,23 @@
 
 <hr/>
 
-<h2>AI provider extensibility</h2>
+<h2>AI provider support</h2>
 <p>
-    The default build supports the AI providers integrated in
-    Odoo's native <code>ai</code> module: OpenAI and Google Gemini.
-    The module's provider layer can be extended to other AI
-    providers &mdash; for example, when the default providers are not
-    reachable from a given region, when a domain-specialized model
-    is preferred for a specific language pair, or when a different
-    provider is required for organizational reasons.
+    The Translation Model and Failover Model dropdowns are built from
+    Odoo's native <code>ai</code> provider registry, so every provider
+    registered on the database is selectable. OpenAI and Google Gemini
+    are available out of the box; Anthropic Claude, DeepSeek and
+    self-hosted / OpenAI-compatible models appear once a provider add-on
+    &mdash; such as the free <em>AI Provider Pool</em> module &mdash; is
+    installed. Any chat model works, as translation is plain text in and
+    plain text out, with no embedding or file requirement.
 </p>
 <p>
-    For inquiries about extending to a different AI provider,
-    contact <code>hello@suitestate.com</code>.
+    This matters when the default providers are not reachable from a
+    given region, when a specific model is preferred for a particular
+    language pair, or when a provider is required for organizational
+    reasons. The primary and failover models can be set to different
+    providers for cross-provider resilience.
 </p>
 
 <hr/>
@@ -197,8 +204,8 @@
 <h2>Requirements</h2>
 <ul>
     <li><strong>Odoo 19 Enterprise.</strong> Depends on the <code>ai</code> and <code>ai_app</code> modules, which are part of the Enterprise edition.</li>
-    <li><strong>An OpenAI or Google Gemini API key</strong> configured in Settings &rarr; General Settings &rarr; AI. The module does not bundle or manage its own keys.</li>
-    <li><strong>Network egress</strong> from the Odoo server to <code>api.openai.com</code> and/or <code>generativelanguage.googleapis.com</code>.</li>
+    <li><strong>An API key for at least one AI provider</strong> configured in Settings &rarr; General Settings &rarr; AI &mdash; OpenAI or Google Gemini out of the box, or Claude / DeepSeek / self-hosted via a provider add-on. The module does not bundle or manage its own keys.</li>
+    <li><strong>Network egress</strong> from the Odoo server to the chosen provider's API endpoint (e.g. <code>api.openai.com</code>, <code>generativelanguage.googleapis.com</code>, or a self-hosted server).</li>
     <li>
         <strong>For WhatsApp translation (optional):</strong> Odoo's native
         <code>whatsapp</code> module installed and configured with a valid
@@ -247,7 +254,7 @@
 
 <p style="text-align:center;">
     <img src="screenshot_02.png"
-         alt="AI translation provider settings - OpenAI and Google Gemini configuration with failover"
+         alt="AI translation settings - primary model and failover configuration"
          style="width:100%; max-width:1920px; height:auto; border-radius:4px;"/>
 </p>
 

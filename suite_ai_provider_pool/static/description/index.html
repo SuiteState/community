@@ -202,8 +202,8 @@ described above.
         </tr>
         <tr>
             <td style="padding:10px 12px; border:1px solid #ddd;">Knowledge Sources (RAG)</td>
-            <td style="padding:10px 12px; border:1px solid #ddd;">Supported</td>
-            <td style="padding:10px 12px; border:1px solid #ddd;">Automatic embedding fallback to OpenAI/Google</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Conditional</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Embeddings require an OpenAI or Google key. Claude, DeepSeek and self-hosted chat models have no embedding API; when one is used, this module routes embeddings to your OpenAI/Google key automatically. Without such a key, Knowledge Sources cannot be embedded.</td>
         </tr>
         <tr>
             <td style="padding:10px 12px; border:1px solid #ddd;">AI Server Actions / Automations</td>
@@ -237,8 +237,8 @@ described above.
         </tr>
         <tr>
             <td style="padding:10px 12px; border:1px solid #ddd;">Web grounding (web search)</td>
-            <td style="padding:10px 12px; border:1px solid #ddd;">Claude / OpenAI / Gemini</td>
-            <td style="padding:10px 12px; border:1px solid #ddd;">Claude uses its server-side web search, version-matched to the model. DeepSeek and self-hosted models offer no web search tool.</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Claude</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">This module adds server-side web search for Claude, version-matched to the model. DeepSeek and self-hosted models offer no web search tool. (OpenAI and Gemini web grounding is native to Odoo and not provided by this module.)</td>
         </tr>
     </tbody>
 </table>

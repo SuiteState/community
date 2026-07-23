@@ -1,24 +1,14 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models
+from odoo import api, fields, models
 
 
-# Supported LLM models for translation, shared by both the primary and
-# failover Selection fields below. Maintained in a single list so adding
-# a new model (e.g. when Odoo's `ai` module adds Anthropic / Mistral
-# support) touches exactly one place. Labels are kept neutral here —
-# primary-specific phrasing ("recommended") is moved to field `help`
-# text so the same choice list works for both fields.
-_MODEL_CHOICES = [
-    # OpenAI
-    ('gpt-5-mini',       'OpenAI GPT-5 Mini'),
-    ('gpt-5',            'OpenAI GPT-5'),
-    ('gpt-4.1-mini',     'OpenAI GPT-4.1 Mini'),
-    ('gpt-4.1',          'OpenAI GPT-4.1'),
-    ('gpt-4o',           'OpenAI GPT-4o'),
-    # Google
-    ('gemini-2.5-flash', 'Google Gemini 2.5 Flash'),
-    ('gemini-2.5-pro',   'Google Gemini 2.5 Pro'),
-]
+# The primary and failover model dropdowns are built dynamically from the
+# native LLM provider registry (see ``_get_translate_model_selection``), so
+# every provider registered with Odoo's ``ai`` module appears automatically —
+# OpenAI and Google out of the box, plus Anthropic Claude, DeepSeek and any
+# self-hosted / third-party provider added by another module (e.g. the free
+# AI Provider Pool). Any chat model works for translation; it is plain text
+# in, plain text out, with no embedding or file requirement.
 
 # Single source of truth for default models. ``mail_message.py``
 # imports these for its ICP fallback values so the defaults stay
@@ -36,15 +26,15 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='suite_ai_translate.enabled',
         help="Enable AI-powered translation in Discuss messages. "
              "When enabled, message text selected for translation will be "
-             "sent to the configured AI provider (OpenAI or Google Gemini) "
-             "over HTTPS. No other data is transmitted. Translation text "
+             "sent to the configured AI provider over HTTPS. No other data "
+             "is transmitted. Translation text "
              "is cached locally in Odoo (auto-vacuumed after 2 weeks) to "
              "minimize repeat API calls. You must review your organization's "
              "data handling policies and the providers' terms before enabling.",
     )
 
     sat_llm_model = fields.Selection(
-        selection=_MODEL_CHOICES,
+        selection="_get_translate_model_selection",
         string='Translation Model',
         default=DEFAULT_PRIMARY_MODEL,
         config_parameter='suite_ai_translate.llm_model',
@@ -56,7 +46,7 @@ class ResConfigSettings(models.TransientModel):
     )
 
     sat_llm_failover_model = fields.Selection(
-        selection=_MODEL_CHOICES,
+        selection="_get_translate_model_selection",
         string='Failover Model',
         default=DEFAULT_FAILOVER_MODEL,
         config_parameter='suite_ai_translate.llm_failover_model',
@@ -66,3 +56,16 @@ class ResConfigSettings(models.TransientModel):
              "failing over to the same provider gives no real resilience. "
              "Only triggered if the other provider has an API key configured.",
     )
+
+    @api.model
+    def _get_translate_model_selection(self):
+        """Every chat model registered with the native ``ai`` module, so
+        third-party providers (Anthropic Claude, DeepSeek, self-hosted, or
+        any added by another module such as AI Provider Pool) appear in the
+        dropdown automatically alongside the built-in OpenAI and Google
+        models. Mirrors the native provider registry; no hardcoded list."""
+        from odoo.addons.ai.utils.llm_providers import PROVIDERS
+        selection = []
+        for provider in PROVIDERS:
+            selection.extend(provider.llms)
+        return selection

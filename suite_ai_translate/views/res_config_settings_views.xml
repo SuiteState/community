@@ -20,34 +20,18 @@
                        name="suite_ai_translate">
                     <setting id="sat_enabled_setting"
                              string="Enable Discuss AI Translate"
-                             help="Master opt-in switch. When enabled, message text selected for translation will be transmitted to the configured AI provider (OpenAI or Google Gemini) over HTTPS. No other data is sent. Disabled by default per Odoo Apps privacy guidelines.">
+                             help="Off by default. When on, only the text you choose to translate is sent to the configured AI provider over HTTPS — no author names, attachments or other metadata.">
                         <field name="sat_enabled"/>
-                        <div class="text-muted mt-2">
-                            <i class="fa fa-info-circle me-1"/>
-                            By enabling this feature, you acknowledge that
-                            message text selected for translation will be
-                            sent to the AI provider configured above
-                            (OpenAI or Google Gemini) over HTTPS. No author
-                            names, attachments, or other metadata are
-                            transmitted. Review the provider's terms and
-                            your organization's data handling policies
-                            before enabling.
-                        </div>
                     </setting>
                     <setting id="sat_llm_model_setting"
                              string="Translation Model"
-                             help="Primary model used by Discuss AI Translate. The 'mini' / 'flash' variants are recommended for cost-efficient conversational translation."
+                             help="Primary model — any provider registered under Settings &gt; AI (OpenAI, Gemini, or Claude/DeepSeek/self-hosted via AI Provider Pool). Smaller 'mini' / 'flash' models are cheapest for chat translation. Needs an API key for the chosen model's provider."
                              invisible="not sat_enabled">
                         <field name="sat_llm_model"/>
-                        <div class="text-muted mt-2">
-                            Make sure an OpenAI or Google Gemini API key
-                            is enabled and set in the Providers block above
-                            before using translation features.
-                        </div>
                     </setting>
                     <setting id="sat_llm_failover_model_setting"
                              string="Failover Model"
-                             help="Automatic fallback when the primary model's provider fails. Pick a model from a DIFFERENT provider for real resilience."
+                             help="Automatic fallback when the primary provider fails — pick a model from a different provider for real resilience."
                              invisible="not sat_enabled">
                         <field name="sat_llm_failover_model"/>
                     </setting>

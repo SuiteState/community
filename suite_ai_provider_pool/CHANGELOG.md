@@ -3,6 +3,19 @@
 All notable changes to **AI Provider Pool** (`suite_ai_provider_pool`).
 This changelog starts at 1.5.0; earlier releases predate it.
 
+## [1.5.1] - 2026-07-24
+
+### Fixed
+- **DeepSeek requests no longer time out at 30 s.** DeepSeek chat calls
+  inherited Odoo's 30-second default while the Anthropic and self-hosted
+  paths already used 120 s; long DeepSeek (reasoner / V4) completions could
+  raise a spurious timeout error. DeepSeek now uses the same 120 s budget.
+
+### Changed
+- Unified the **AI Automation Model** help text so the field tooltip and the
+  Settings description read identically (previously two slightly different
+  wordings).
+
 ## [1.5.0] - 2026-07-24
 
 ### Added

@@ -851,6 +851,7 @@ def _request_llm_deepseek(
             endpoint="/chat/completions",
             headers=self._get_base_headers(),
             body=b,
+            timeout=120,
         )
 
     with api_call_logging(messages, tools) as record_response:

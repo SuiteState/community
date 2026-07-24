@@ -146,15 +146,8 @@ msgid ""
 msgstr ""
 
 #. module: suite_ai_provider_pool
-#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
-msgid ""
-"Model for Odoo's built-in AI automations (server actions / rules flagged "
-"'AI', document sorting) — NOT the chatbot. Odoo defaults to OpenAI GPT-4.1; "
-"pick another provider to run them on Claude, DeepSeek or self-hosted."
-msgstr ""
-
-#. module: suite_ai_provider_pool
 #: model:ir.model.fields,help:suite_ai_provider_pool.field_res_config_settings__suite_server_action_model
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
 msgid ""
 "Model for Odoo's built-in AI automations (server actions / rules flagged "
 "'AI', document sorting) — NOT the chatbot; AI Agents and the WhatsApp AI "

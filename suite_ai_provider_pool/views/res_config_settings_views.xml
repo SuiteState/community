@@ -8,7 +8,7 @@
             <xpath expr="//block[@name='ai_providers']" position="inside">
                 <setting id="suite_server_action_model"
                          string="AI Automation Model"
-                         help="Model for Odoo's built-in AI automations (server actions / rules flagged 'AI', document sorting) — NOT the chatbot. Odoo defaults to OpenAI GPT-4.1; pick another provider to run them on Claude, DeepSeek or self-hosted."
+                         help="Model for Odoo's built-in AI automations (server actions / rules flagged 'AI', document sorting) — NOT the chatbot; AI Agents and the WhatsApp AI keep their own model. Odoo defaults to OpenAI GPT-4.1; set this to use Claude, DeepSeek or self-hosted. Leave empty to keep the default (needs an OpenAI key)."
                          groups="base.group_system">
                     <div class="flex-grow-1">
                         <field name="suite_server_action_model" nolabel="1" class="w-50"/>

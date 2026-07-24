@@ -1,0 +1,78 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* suite_ai_provider_pool
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-24 21:30+0000\n"
+"PO-Revision-Date: 2026-07-24 21:30+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar_001\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_ai_agent__suite_web_search_enabled
+msgid "Search the Web"
+msgstr "البحث في الويب"
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_ai_agent__suite_web_search_enabled
+msgid ""
+"Let this agent search the web when answering. Odoo has no built-in toggle "
+"for this — the Provider Pool wires it for every provider: OpenAI and Gemini "
+"use their native web search, Claude uses its server-side search, and "
+"DeepSeek / self-hosted models use Tavily (set a Tavily API key in Settings →"
+" AI). OpenAI and Tavily results are localized to your company's country "
+"automatically. Gemini cannot combine web search with tools, so it is skipped"
+" silently when the agent has tools attached. Off by default."
+msgstr ""
+"يسمح لهذا الوكيل بالبحث في الويب عند الإجابة. لا يوفّر Odoo مفتاحًا مدمجًا "
+"لذلك — تقوم حزمة Provider Pool بتفعيله لكل مزوّد: يستخدم OpenAI وGemini البحث"
+" المدمج الخاص بهما، ويستخدم Claude البحث من جهة الخادم، وتستخدم نماذج "
+"DeepSeek / المستضافة ذاتيًا خدمة Tavily (أدخل مفتاح Tavily في الإعدادات → "
+"الذكاء الاصطناعي). تُخصَّص نتائج OpenAI وTavily تلقائيًا حسب بلد شركتك. لا "
+"يستطيع Gemini الجمع بين البحث في الويب والأدوات، لذا يتم تخطّيه بصمت عندما "
+"تكون هناك أدوات مرفقة بالوكيل. مُعطَّل افتراضيًا."
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__suite_tavily_key
+msgid "Tavily API Key"
+msgstr "مفتاح Tavily API"
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_res_config_settings__suite_tavily_key
+msgid ""
+"Optional. Enables web search for DeepSeek and self-hosted models (which have"
+" no built-in search) via Tavily. Get a key at tavily.com. Not needed for "
+"OpenAI, Gemini or Claude, which search natively. Results are localized to "
+"your company's country. If the environment variable ODOO_AI_TAVILY_TOKEN is "
+"set, it overrides this value. Leave empty to disable Tavily search."
+msgstr ""
+"اختياري. يُفعِّل البحث في الويب لنماذج DeepSeek والنماذج المستضافة ذاتيًا "
+"(التي لا تملك بحثًا مدمجًا) عبر Tavily. احصل على مفتاح من tavily.com. غير "
+"مطلوب لـ OpenAI أو Gemini أو Claude لأنها تبحث محليًا. تُخصَّص النتائج حسب "
+"بلد شركتك. إذا تم ضبط متغيّر البيئة ODOO_AI_TAVILY_TOKEN فإنه يتجاوز هذه "
+"القيمة. اتركه فارغًا لتعطيل بحث Tavily."
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Web search for DeepSeek / self-hosted (Tavily)"
+msgstr "البحث في الويب لـ DeepSeek / المستضافة ذاتيًا (Tavily)"
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid ""
+"Optional. OpenAI, Gemini and Claude search the web natively; DeepSeek and "
+"self-hosted models don't, so they use Tavily. Set the key here, then turn on"
+" 'Search the Web' on the AI Agent. Results are localized to your company's "
+"country."
+msgstr ""
+"اختياري. يبحث OpenAI وGemini وClaude في الويب محليًا؛ أما DeepSeek والنماذج "
+"المستضافة ذاتيًا فلا، لذا تستخدم Tavily. أدخل المفتاح هنا، ثم فعِّل “البحث في "
+"الويب” على وكيل الذكاء الاصطناعي. تُخصَّص النتائج حسب بلد شركتك."

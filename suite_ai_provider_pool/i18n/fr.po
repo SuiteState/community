@@ -1,0 +1,82 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* suite_ai_provider_pool
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-24 21:30+0000\n"
+"PO-Revision-Date: 2026-07-24 21:30+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_ai_agent__suite_web_search_enabled
+msgid "Search the Web"
+msgstr "Rechercher sur le web"
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_ai_agent__suite_web_search_enabled
+msgid ""
+"Let this agent search the web when answering. Odoo has no built-in toggle "
+"for this — the Provider Pool wires it for every provider: OpenAI and Gemini "
+"use their native web search, Claude uses its server-side search, and "
+"DeepSeek / self-hosted models use Tavily (set a Tavily API key in Settings →"
+" AI). OpenAI and Tavily results are localized to your company's country "
+"automatically. Gemini cannot combine web search with tools, so it is skipped"
+" silently when the agent has tools attached. Off by default."
+msgstr ""
+"Permet à cet agent de rechercher sur le web lorsqu'il répond. Odoo ne "
+"propose pas de bouton natif pour cela — le Provider Pool le connecte pour "
+"chaque fournisseur : OpenAI et Gemini utilisent leur recherche web native, "
+"Claude utilise sa recherche côté serveur, et les modèles DeepSeek / "
+"auto-hébergés utilisent Tavily (renseignez une clé API Tavily dans "
+"Paramètres → IA). Les résultats d'OpenAI et de Tavily sont automatiquement "
+"localisés selon le pays de votre société. Gemini ne peut pas combiner la "
+"recherche web avec des outils : elle est donc ignorée silencieusement "
+"lorsque l'agent a des outils attachés. Désactivé par défaut."
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__suite_tavily_key
+msgid "Tavily API Key"
+msgstr "Clé API Tavily"
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_res_config_settings__suite_tavily_key
+msgid ""
+"Optional. Enables web search for DeepSeek and self-hosted models (which have"
+" no built-in search) via Tavily. Get a key at tavily.com. Not needed for "
+"OpenAI, Gemini or Claude, which search natively. Results are localized to "
+"your company's country. If the environment variable ODOO_AI_TAVILY_TOKEN is "
+"set, it overrides this value. Leave empty to disable Tavily search."
+msgstr ""
+"Facultatif. Active la recherche web pour les modèles DeepSeek et "
+"auto-hébergés (qui n'ont pas de recherche intégrée) via Tavily. Obtenez une "
+"clé sur tavily.com. Inutile pour OpenAI, Gemini ou Claude, qui recherchent "
+"nativement. Les résultats sont localisés selon le pays de votre société. Si "
+"la variable d'environnement ODOO_AI_TAVILY_TOKEN est définie, elle remplace "
+"cette valeur. Laissez vide pour désactiver la recherche Tavily."
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Web search for DeepSeek / self-hosted (Tavily)"
+msgstr "Recherche web pour DeepSeek / auto-hébergés (Tavily)"
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid ""
+"Optional. OpenAI, Gemini and Claude search the web natively; DeepSeek and "
+"self-hosted models don't, so they use Tavily. Set the key here, then turn on"
+" 'Search the Web' on the AI Agent. Results are localized to your company's "
+"country."
+msgstr ""
+"Facultatif. OpenAI, Gemini et Claude recherchent sur le web nativement ; "
+"DeepSeek et les modèles auto-hébergés non, ils utilisent donc Tavily. "
+"Renseignez la clé ici, puis activez « Rechercher sur le web » sur l'agent "
+"IA. Les résultats sont localisés selon le pays de votre société."

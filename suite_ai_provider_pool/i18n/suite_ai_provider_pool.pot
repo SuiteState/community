@@ -1,0 +1,347 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* suite_ai_provider_pool
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-24 21:30+0000\n"
+"PO-Revision-Date: 2026-07-24 21:30+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: suite_ai_provider_pool
+#: model:ir.model,name:suite_ai_provider_pool.model_ai_agent
+msgid "AI Agent"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__suite_server_action_model
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "AI Automation Model"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_res_config_settings__suite_anthropic_key
+msgid ""
+"API key used for Anthropic Claude chat models. Get one at "
+"console.anthropic.com. If the environment variable ODOO_AI_ANTHROPIC_TOKEN "
+"is set, it overrides this value."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_res_config_settings__suite_deepseek_key
+msgid ""
+"API key used for DeepSeek chat models. Get one at platform.deepseek.com. If "
+"the environment variable ODOO_AI_DEEPSEEK_TOKEN is set, it overrides this "
+"value."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/models/res_config_settings.py:0
+msgid ""
+"Added %(added)d new model(s) from %(url)s. Click Save to make them "
+"selectable in your AI Agents."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_res_config_settings__suite_selfhosted_models
+msgid ""
+"Additional model identifiers exposed in the AI Agent model selector, one per"
+" line. Use the format expected by your server (e.g. 'qwen2.5:14b' for "
+"Ollama). Add '| Display Name' after the identifier to set a friendly label. "
+"Use the Fetch Available Models button to populate this list automatically."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__suite_anthropic_key
+msgid "Anthropic API Key"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_res_config_settings__suite_selfhosted_url
+msgid ""
+"Base URL of an OpenAI-compatible inference server: Ollama, vLLM, LM Studio, "
+"or any other endpoint that exposes /v1/chat/completions. The /v1 suffix is "
+"added automatically if you only type host:port. Examples: "
+"http://localhost:11434, http://192.168.1.10:8000."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model,name:suite_ai_provider_pool.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Connect a self-hosted LLM server"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/models/res_config_settings.py:0
+msgid "Could not reach %(url)s: %(detail)s"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__suite_deepseek_key
+msgid "DeepSeek API Key"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_ai_agent__display_name
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_ir_actions_server__display_name
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Fetch Available Models"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/models/res_config_settings.py:0
+msgid "Fill in the Self-Hosted Server URL first."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_ai_agent__id
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_ir_actions_server__id
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__id
+msgid "ID"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Key"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/models/ai_agent.py:0
+msgid ""
+"Knowledge Sources require an OpenAI or Google API key for text embedding. "
+"Your current chat model does not include an embedding service. Please "
+"configure an OpenAI or Google key in Settings > AI."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_ai_agent__suite_web_search_enabled
+msgid ""
+"Let this agent search the web when answering. Odoo has no built-in toggle "
+"for this — the Provider Pool wires it for every provider: OpenAI and Gemini "
+"use their native web search, Claude uses its server-side search, and "
+"DeepSeek / self-hosted models use Tavily (set a Tavily API key in Settings →"
+" AI). OpenAI and Tavily results are localized to your company's country "
+"automatically. Gemini cannot combine web search with tools, so it is skipped"
+" silently when the agent has tools attached. Off by default."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid ""
+"Model for Odoo's built-in AI automations (server actions / rules flagged "
+"'AI', document sorting) — NOT the chatbot. Odoo defaults to OpenAI GPT-4.1; "
+"pick another provider to run them on Claude, DeepSeek or self-hosted."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_res_config_settings__suite_server_action_model
+msgid ""
+"Model for Odoo's built-in AI automations (server actions / rules flagged "
+"'AI', document sorting) — NOT the chatbot; AI Agents and the WhatsApp AI "
+"keep their own model. Odoo defaults to OpenAI GPT-4.1; set this to use "
+"Claude, DeepSeek or self-hosted. Leave empty to keep the default (needs an "
+"OpenAI key)."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/utils/_api_service_patch.py:0
+msgid "No API key set for provider '%s'"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/models/res_config_settings.py:0
+msgid ""
+"No new models — all %(count)d model(s) on %(url)s are already in the list."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Optional bearer token"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_res_config_settings__suite_selfhosted_key
+msgid ""
+"Optional bearer token for servers that require authentication. Leave empty "
+"for local Ollama instances without auth. If the environment variable "
+"ODOO_AI_SELFHOSTED_TOKEN is set, it overrides this value."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,help:suite_ai_provider_pool.field_res_config_settings__suite_tavily_key
+msgid ""
+"Optional. Enables web search for DeepSeek and self-hosted models (which have"
+" no built-in search) via Tavily. Get a key at tavily.com. Not needed for "
+"OpenAI, Gemini or Claude, which search natively. Results are localized to "
+"your company's country. If the environment variable ODOO_AI_TAVILY_TOKEN is "
+"set, it overrides this value. Leave empty to disable Tavily search."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid ""
+"Optional. OpenAI, Gemini and Claude search the web natively; DeepSeek and "
+"self-hosted models don't, so they use Tavily. Set the key here, then turn on"
+" 'Search the Web' on the AI Agent. Results are localized to your company's "
+"country."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Provide your API key to connect with your account"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/utils/_api_service_patch.py:0
+msgid ""
+"Provider '%s' does not support file attachments in this module. Use OpenAI "
+"or Gemini for chats that include files."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/utils/_api_service_patch.py:0
+msgid ""
+"Provider '%s' does not support structured output (json schema) in this "
+"module. Use OpenAI or Gemini for structured tasks."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/models/res_config_settings.py:0
+msgid "Reached %(url)s, %(count)d model(s) available."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid ""
+"Run any open-source model on your own server (Ollama, vLLM, LM Studio) and "
+"use it from Odoo. OpenAI-compatible endpoints only."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_ai_agent__suite_web_search_enabled
+msgid "Search the Web"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/models/res_config_settings.py:0
+msgid "Self-Hosted AI connection OK"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/utils/_api_service_patch.py:0
+msgid ""
+"Self-Hosted AI server URL is not configured. Open Settings → AI and fill in "
+"the Server URL."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/utils/_api_service_patch.py:0
+msgid "Self-Hosted AI server returned an error: %s"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__suite_selfhosted_key
+msgid "Self-Hosted API Key"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__suite_selfhosted_models
+msgid "Self-Hosted Custom Models"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__suite_selfhosted_url
+msgid "Self-Hosted Server URL"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/models/res_config_settings.py:0
+msgid "Self-Hosted models fetched"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model,name:suite_ai_provider_pool.model_ir_actions_server
+msgid "Server Action"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/models/res_config_settings.py:0
+msgid ""
+"Server at %s did not list any models. Make sure at least one model is "
+"loaded."
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#. odoo-python
+#: code:addons/suite_ai_provider_pool/models/res_config_settings.py:0
+msgid ""
+"Server at %s returned a non-JSON response — is this an OpenAI-compatible "
+"endpoint?"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model:ir.model.fields,field_description:suite_ai_provider_pool.field_res_config_settings__suite_tavily_key
+msgid "Tavily API Key"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Test Connection"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Use your own Anthropic Claude account"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Use your own DeepSeek account"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "Web search for DeepSeek / self-hosted (Tavily)"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid "http://localhost:11434"
+msgstr ""
+
+#. module: suite_ai_provider_pool
+#: model_terms:ir.ui.view,arch_db:suite_ai_provider_pool.res_config_settings_view_form_suite_ai_provider_pool
+msgid ""
+"qwen2.5:14b\n"
+"llama3.3:70b | Llama 3.3 70B"
+msgstr ""

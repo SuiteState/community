@@ -88,6 +88,18 @@ class ResConfigSettings(models.TransientModel):
             "it overrides this value."
         ),
     )
+    suite_tavily_key = fields.Char(
+        string="Tavily API Key",
+        config_parameter="ai.tavily_key",
+        help=(
+            "Optional. Enables web search for DeepSeek and self-hosted models "
+            "(which have no built-in search) via Tavily. Get a key at "
+            "tavily.com. Not needed for OpenAI, Gemini or Claude, which search "
+            "natively. Results are localized to your company's country. "
+            "If the environment variable ODOO_AI_TAVILY_TOKEN is set, it "
+            "overrides this value. Leave empty to disable Tavily search."
+        ),
+    )
     suite_server_action_model = fields.Selection(
         selection="_get_llm_model_selection",
         string="AI Automation Model",

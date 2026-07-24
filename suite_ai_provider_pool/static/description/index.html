@@ -30,9 +30,9 @@ environment variable.
 
 <h3>DeepSeek</h3>
 <p>
-Chat Completions API with function calling. Supports DeepSeek-Chat
-and DeepSeek-Reasoner models. API key configured per database or
-via <code>ODOO_AI_DEEPSEEK_TOKEN</code>.
+Chat Completions API with function calling. Supports DeepSeek V4 Pro
+and V4 Flash models. Optional web search via Tavily (see below). API
+key configured per database or via <code>ODOO_AI_DEEPSEEK_TOKEN</code>.
 </p>
 
 <h3>Self-Hosted (OpenAI-compatible)</h3>
@@ -157,6 +157,8 @@ in the same section as the native OpenAI and Gemini providers:</p>
         <code>host:port</code> input.</li>
     <li><strong>Custom model list</strong> &mdash; manually entered or
         fetched from the server's <code>/v1/models</code> endpoint.</li>
+    <li><strong>Tavily API key</strong> &mdash; optional; enables web
+        search for DeepSeek and self-hosted models.</li>
 </ul>
 
 <p>Multi-company safe. Keys and URLs are stored as system parameters
@@ -236,12 +238,63 @@ described above.
             <td style="padding:10px 12px; border:1px solid #ddd;">Requires provider-specific response format</td>
         </tr>
         <tr>
-            <td style="padding:10px 12px; border:1px solid #ddd;">Web grounding (web search)</td>
-            <td style="padding:10px 12px; border:1px solid #ddd;">Claude</td>
-            <td style="padding:10px 12px; border:1px solid #ddd;">This module adds server-side web search for Claude, version-matched to the model. DeepSeek and self-hosted models offer no web search tool. (OpenAI and Gemini web grounding is native to Odoo and not provided by this module.)</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Web search (grounding)</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">All 5 providers</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">One toggle on the AI Agent &mdash; <strong>Search the Web</strong> &mdash; enables it for OpenAI, Gemini, Claude, DeepSeek and self-hosted models. Each provider uses a different underlying mechanism (see below). Odoo has no such toggle out of the box; this module adds it.</td>
         </tr>
     </tbody>
 </table>
+
+<hr/>
+
+<h2>Web search on any model</h2>
+
+<p style="font-size:18px; color:#555;">
+Turn on <strong>Search the Web</strong> on any AI Agent and it can ground its
+answers in live web results. Odoo 19 ships no such toggle &mdash; this module adds
+it and wires each provider to the right mechanism. Results are localized to your
+company's country automatically (OpenAI adds your city too).
+</p>
+
+<table style="width:100%; border-collapse:collapse; margin:16px 0;">
+    <thead>
+        <tr style="background:#f5f5f5;">
+            <th style="padding:10px 12px; text-align:left; border:1px solid #ddd;">Provider</th>
+            <th style="padding:10px 12px; text-align:left; border:1px solid #ddd;">How it searches</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding:10px 12px; border:1px solid #ddd;"><strong>OpenAI</strong></td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">The model's own built-in web search, with your company country and city passed for localized results.</td>
+        </tr>
+        <tr>
+            <td style="padding:10px 12px; border:1px solid #ddd;"><strong>Claude</strong></td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Anthropic's server-side web search tool, version-matched to the Claude model automatically.</td>
+        </tr>
+        <tr>
+            <td style="padding:10px 12px; border:1px solid #ddd;"><strong>Gemini</strong></td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Google's built-in search. <em>Model limitation:</em> Gemini cannot combine web search with tools &mdash; when the agent also has tools attached, Gemini answers without searching. This is a restriction of the Gemini API itself, not this module; we detect it and reply normally instead of erroring.</td>
+        </tr>
+        <tr>
+            <td style="padding:10px 12px; border:1px solid #ddd;"><strong>DeepSeek</strong></td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">These models have no native web search, so the module runs the search itself through <strong>Tavily</strong>: add a Tavily API key in Settings &rarr; AI and the model gains a search tool it can call. Without a key it simply answers without searching.</td>
+        </tr>
+        <tr>
+            <td style="padding:10px 12px; border:1px solid #ddd;"><strong>Self-hosted</strong></td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Same as DeepSeek &mdash; web search via a Tavily key, since open-source chat servers ship no search of their own.</td>
+        </tr>
+    </tbody>
+</table>
+
+<p style="font-size:15px; color:#777;">
+<strong>Why the mechanisms differ:</strong> each model ships different capabilities.
+OpenAI, Gemini and Claude carry their own search; DeepSeek and self-hosted models do
+not, so the module supplies one via Tavily. Any per-model behavior above (such as
+Gemini's tools-vs-search limit) comes from the model provider's own API, not from this
+module &mdash; the module simply exposes one consistent toggle and routes each model to
+the best available option.
+</p>
 
 <hr/>
 
@@ -254,9 +307,12 @@ described above.
     <li><strong>For Knowledge Sources:</strong> an additional OpenAI or
         Google API key for embedding (only needed when using Claude,
         DeepSeek, or Self-Hosted as the chat model).</li>
+    <li><strong>For web search on DeepSeek / self-hosted:</strong> an
+        optional Tavily API key (OpenAI, Gemini and Claude search
+        natively without one).</li>
     <li><strong>Network egress</strong> from the Odoo server to
         <code>api.anthropic.com</code>, <code>api.deepseek.com</code>,
-        or your self-hosted server.</li>
+        <code>api.tavily.com</code>, or your self-hosted server.</li>
 </ul>
 
 <hr/>

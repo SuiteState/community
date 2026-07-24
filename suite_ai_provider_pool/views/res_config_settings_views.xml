@@ -30,6 +30,14 @@
                         <field name="suite_deepseek_key" placeholder="Key" password="True" nolabel="1" class="w-100"/>
                     </div>
                 </setting>
+                <setting id="suite_tavily_provider"
+                         string="Web search for DeepSeek / self-hosted (Tavily)"
+                         help="Optional. OpenAI, Gemini and Claude search the web natively; DeepSeek and self-hosted models don't, so they use Tavily. Set the key here, then turn on 'Search the Web' on the AI Agent. Results are localized to your company's country."
+                         groups="base.group_system">
+                    <div class="flex-grow-1">
+                        <field name="suite_tavily_key" placeholder="Key" password="True" nolabel="1" class="w-100"/>
+                    </div>
+                </setting>
                 <setting id="suite_selfhosted_provider"
                          string="Connect a self-hosted LLM server"
                          help="Run any open-source model on your own server (Ollama, vLLM, LM Studio) and use it from Odoo. OpenAI-compatible endpoints only."

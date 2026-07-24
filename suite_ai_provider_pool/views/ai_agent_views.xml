@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Add a "Search the Web" toggle to the AI Agent form. Odoo 19 has no
+        native web-search toggle: web_grounding is a request_llm parameter that
+        no standard flow ever turns on. This module wires it for every provider
+        (see utils/_api_service_patch), so the toggle is meaningful on any agent.
+    -->
+    <record id="ai_agent_view_form_suite_web_search" model="ir.ui.view">
+        <field name="name">ai.agent.form.inherit.suite_web_search</field>
+        <field name="model">ai.agent</field>
+        <field name="inherit_id" ref="ai_app.ai_agent_view_form"/>
+        <field name="arch" type="xml">
+            <field name="response_style" position="after">
+                <field name="suite_web_search_enabled"/>
+            </field>
+        </field>
+    </record>
+</odoo>

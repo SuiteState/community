@@ -72,7 +72,7 @@ Limitations
 
 License: LGPL-3.
 """,
-    "version": "19.0.1.4.1",
+    "version": "19.0.1.5.0",
     "category": "Productivity/AI",
     "license": "LGPL-3",
     "author": "SuiteState",
@@ -81,6 +81,7 @@ License: LGPL-3.
     "depends": ["ai_app"],
     "data": [
         "views/res_config_settings_views.xml",
+        "views/ai_agent_views.xml",
     ],
     "images": ["static/description/suite_ai_pool_screenshot.png"],
     "installable": True,

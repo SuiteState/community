@@ -33,9 +33,13 @@ DEEPSEEK = Provider(
     display_name="DeepSeek",
     embedding_model="",
     embedding_config={},
+    # DeepSeek retired the deepseek-chat / deepseek-reasoner API names; the
+    # platform now serves deepseek-v4-pro and deepseek-v4-flash (verified live
+    # 2026-07-24 — the API rejects the old names outright), so we list only the
+    # models that actually work.
     llms=[
-        ("deepseek-chat", "DeepSeek V3 (Chat)"),
-        ("deepseek-reasoner", "DeepSeek R1 (Reasoner)"),
+        ("deepseek-v4-pro", "DeepSeek V4 Pro"),
+        ("deepseek-v4-flash", "DeepSeek V4 Flash"),
     ],
     deprecated_models=[],
 )

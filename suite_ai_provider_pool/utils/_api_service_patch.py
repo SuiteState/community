@@ -21,11 +21,24 @@ Mirrors the contract used by the OpenAI and Google branches in
 - ``_build_tool_call_response(tool_call_id, return_value)`` builds the
   message that wraps a tool result for the next turn.
 
-Scope: chat + tool use for all three providers. Anthropic additionally
-supports ``web_grounding`` via Claude's server-side web search tool. The
-``files`` and ``schema`` parameters still raise ``UserError`` for our
-providers (out of scope). ``web_grounding`` raises ``UserError`` for
-DeepSeek and Self-Hosted, which do not offer a web search tool.
+Scope: chat + tool use for all three providers. Web search (``web_grounding``)
+is supported on every provider: Anthropic via Claude's server-side web search
+tool; DeepSeek and Self-Hosted via a Tavily-backed ``web_search`` function tool
+run in an internal loop here (silently skipped when no Tavily key is set). The
+``files`` and ``schema`` parameters still raise ``UserError`` for our providers
+(out of scope).
+
+This module also owns two cross-provider web-search behaviours so callers
+(native Ask AI, WhatsApp AI, …) don't each re-implement them:
+
+- ``request_llm`` is patched so an agent-level opt-in flag carried in the
+  context (``ai_web_grounding``, set by ``ai.agent._generate_response``) turns
+  on grounding when the caller didn't pass it explicitly. Priority is
+  ``explicit web_grounding OR context`` — an explicit truthy value always wins
+  and is never overwritten.
+- The Gemini "cannot combine web search with tools" ``NotImplementedError`` is
+  caught in the dispatcher and retried once without grounding, so every caller
+  degrades gracefully instead of dropping the reply.
 """
 
 import json
@@ -97,6 +110,22 @@ _CLAUDE_MAJOR_MINOR_RE = re.compile(r"(\d+)-(\d+)")
 # not a hardcoded model list) so future models are handled without changes.
 _SAMPLING_KEYS = ("temperature", "top_p", "top_k")
 
+# Tavily web search, used to ground DeepSeek / Self-Hosted (neither has a
+# built-in search tool). We expose a `web_search` function tool to the model
+# and run the searches ourselves in an internal loop — same shape as Claude's
+# server-side loop, but client-side. Caps mirror the Anthropic path so a
+# customer-facing bot can never spin unbounded: at most _MAX_CONTINUATIONS
+# resume rounds, and _MAX_USES searches per reply.
+_TAVILY_URL = "https://api.tavily.com/search"
+_TAVILY_KEY_PARAM = "ai.tavily_key"
+_TAVILY_ENV_VAR = "ODOO_AI_TAVILY_TOKEN"
+_TAVILY_TOOL_NAME = "web_search"
+_TAVILY_MAX_RESULTS = 5
+_TAVILY_TIMEOUT = 30
+# Reuse the same ceilings as the Claude web-search loop for consistency.
+_WEB_SEARCH_MAX_USES_TAVILY = _WEB_SEARCH_MAX_USES
+_WEB_SEARCH_MAX_CONTINUATIONS_TAVILY = _WEB_SEARCH_MAX_CONTINUATIONS
+
 
 def normalize_selfhosted_url(raw):
     """Best-effort normalization of a user-entered server URL: strip
@@ -137,7 +166,10 @@ def selfhosted_request_headers(api_token):
     return headers
 
 
-def _reject_unsupported(provider, files, schema, web_grounding):
+def _reject_unsupported(provider, files, schema):
+    """Reject the parameters our providers genuinely cannot serve. Web search
+    is NOT rejected here: Anthropic handles it via Claude's server tool, and
+    DeepSeek / Self-Hosted via the Tavily loop (or a silent skip if unkeyed)."""
     if files:
         raise UserError(_(
             "Provider '%s' does not support file attachments in this module. "
@@ -148,12 +180,6 @@ def _reject_unsupported(provider, files, schema, web_grounding):
         raise UserError(_(
             "Provider '%s' does not support structured output (json schema) "
             "in this module. Use OpenAI or Gemini for structured tasks.",
-            provider,
-        ))
-    if web_grounding:
-        raise UserError(_(
-            "Provider '%s' has no web search tool. "
-            "Use OpenAI, Gemini or Claude for web-grounded chats.",
             provider,
         ))
 
@@ -247,7 +273,40 @@ LLMApiService.get_embedding = _patched_get_embedding
 # _request_llm — dispatcher extension (deprecation check kept at top)
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# request_llm (public) — honour the agent-level web-search opt-in carried in
+# the context. Native ``ai.agent._generate_response`` never passes
+# web_grounding; our ai.agent override flags it via ``ai_web_grounding`` in the
+# context instead of rewriting the native method body. Priority is
+# ``explicit OR context`` — an explicitly passed truthy value always wins and a
+# caller that passes False on an env WITHOUT the flag stays False, so the
+# WhatsApp path (explicit getattr) and native path never fight each other.
+# ---------------------------------------------------------------------------
+
+_orig_request_llm_public = LLMApiService.request_llm
+
+
+def _patched_request_llm_public(self, *args, **kwargs):
+    ctx_grounding = bool(self.env.context.get("ai_web_grounding"))
+    if ctx_grounding:
+        kwargs["web_grounding"] = bool(kwargs.get("web_grounding")) or ctx_grounding
+    return _orig_request_llm_public(self, *args, **kwargs)
+
+
+LLMApiService.request_llm = _patched_request_llm_public
+
+
+# ---------------------------------------------------------------------------
+# _request_llm — dispatcher extension (deprecation check kept at top)
+# ---------------------------------------------------------------------------
+
 _orig_request_llm = LLMApiService._request_llm
+
+# Gemini raises this exact message when asked to combine web search with tools
+# (native llm_api_service, ~line 439). We match on the message — never a bare
+# ``except NotImplementedError`` — so the sibling "structured output with tools"
+# error and any future unrelated NotImplementedError still propagate.
+_GEMINI_GROUNDING_CONFLICT = "web grounding"
 
 
 def _patched_request_llm(self, *args, **kwargs):
@@ -259,7 +318,20 @@ def _patched_request_llm(self, *args, **kwargs):
         if self.provider == "deepseek":
             return self._request_llm_deepseek(*args, **kwargs)
         return self._request_llm_selfhosted(*args, **kwargs)
-    return _orig_request_llm(self, *args, **kwargs)
+    # Native providers (openai / google). Gemini can't combine web search with
+    # tools; rather than drop the reply, retry once WITHOUT grounding so the
+    # customer still gets an answer. Narrowly matched so we never mask an
+    # unrelated failure that happens to reuse NotImplementedError.
+    try:
+        return _orig_request_llm(self, *args, **kwargs)
+    except NotImplementedError as exc:
+        if kwargs.get("web_grounding") and _GEMINI_GROUNDING_CONFLICT in str(exc).lower():
+            _logger.info(
+                "%s: web search cannot combine with tools; retrying without it",
+                self.provider,
+            )
+            return _orig_request_llm(self, *args, **{**kwargs, "web_grounding": False})
+        raise
 
 
 LLMApiService._request_llm = _patched_request_llm
@@ -347,7 +419,7 @@ def _request_llm_anthropic(
     """Anthropic Messages API. Returns ``(response, to_call, next_inputs)``."""
     # web_grounding is handled below (Claude web search tool), so it is not
     # rejected here — only files / schema remain out of scope for Anthropic.
-    _reject_unsupported("anthropic", files, schema, web_grounding=False)
+    _reject_unsupported("anthropic", files, schema)
 
     system_text = "\n\n".join(p for p in (system_prompts or []) if p)
     user_text = "\n\n".join(p for p in (user_prompts or []) if p)
@@ -567,6 +639,199 @@ def _parse_openai_compatible_response(data, inputs, provider_label):
 
 
 # ---------------------------------------------------------------------------
+# Tavily web search — grounds DeepSeek / Self-Hosted, which have no native
+# search. We advertise a `web_search` function tool, let the model call it, run
+# Tavily ourselves, feed results back, and loop — all transparent to the
+# framework's own tool loop (it never sees the web_search tool).
+# ---------------------------------------------------------------------------
+
+def _tavily_key(env):
+    """Tavily API key from settings, env var as fallback; '' when unset."""
+    return (
+        env["ir.config_parameter"].sudo().get_param(_TAVILY_KEY_PARAM)
+        or os.getenv(_TAVILY_ENV_VAR)
+        or ""
+    )
+
+
+def _tavily_tool_def():
+    """OpenAI-format function tool the model calls to request a web search."""
+    return {
+        "type": "function",
+        "function": {
+            "name": _TAVILY_TOOL_NAME,
+            "description": (
+                "Search the public web for current, real-time or external "
+                "information you are not sure about (news, prices, recent "
+                "events, facts that may have changed). Returns a short list of "
+                "result snippets with sources."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query, in natural language.",
+                    },
+                },
+                "required": ["query"],
+            },
+        },
+    }
+
+
+def _format_tavily_results(data):
+    """Flatten a Tavily response into a compact text block for the model."""
+    parts = []
+    if answer := data.get("answer"):
+        parts.append("Summary: %s" % answer)
+    for r in data.get("results") or ():
+        title = r.get("title") or ""
+        url = r.get("url") or ""
+        content = (r.get("content") or "").strip()
+        parts.append("- %s (%s)\n  %s" % (title, url, content))
+    return "\n".join(parts) or "No results found."
+
+
+def _run_tavily_search(env, query):
+    """Run one Tavily search. Localizes to the company country (parity with
+    OpenAI's native ``user_location``); if the API rejects the ``country``
+    param it retries once without it. Returns a text block, or ``None`` when
+    no key is set. Any transport error is swallowed to a short notice so the
+    model still answers."""
+    key = _tavily_key(env)
+    if not key:
+        return None
+    if not (query or "").strip():
+        return "No results found."
+    payload = {
+        "api_key": key,
+        "query": query,
+        "max_results": _TAVILY_MAX_RESULTS,
+        "search_depth": "basic",
+        "include_answer": True,
+    }
+    country = env.company.country_id
+    if country and country.name:
+        # Tavily's `country` boosts local results; it expects a lowercase
+        # country name (e.g. "united arab emirates").
+        payload["country"] = country.name.lower()
+    for attempt in (1, 2):
+        try:
+            resp = requests.post(_TAVILY_URL, json=payload, timeout=_TAVILY_TIMEOUT)
+            resp.raise_for_status()
+            return _format_tavily_results(resp.json())
+        except requests.RequestException as exc:
+            # First failure with a country hint: it may be an unsupported
+            # param on the caller's Tavily plan — retry once without it before
+            # giving up. Otherwise degrade to a notice (the bot still replies).
+            if attempt == 1 and payload.pop("country", None):
+                continue
+            _logger.warning("Tavily search failed: %s", exc)
+            return "Web search is currently unavailable."
+
+
+def _openai_compatible_web_search_run(self, body, inputs, provider_label, post_fn):
+    """Drive an OpenAI-compatible chat with a Tavily-backed web_search tool.
+
+    Handles the search sub-loop internally: when the model calls web_search we
+    run Tavily and feed the result back; only a final answer or a NON-web_search
+    tool call (a real agent tool) is returned to the framework. Returns the
+    4-tuple ``(response, to_call, next_inputs, usage)`` like the plain helper.
+
+    Bounded exactly like the Claude loop: at most ``_MAX_CONTINUATIONS`` resume
+    rounds and ``_MAX_USES`` total searches, so it can never spin unbounded.
+    """
+    tools = list(body.get("tools") or ())
+    tools.append(_tavily_tool_def())
+    body = {**body, "tools": tools, "tool_choice": "auto"}
+
+    messages = list(body["messages"])
+    next_inputs = list(inputs or ())
+    agg_usage = {"input_tokens": 0, "cached_tokens": 0, "output_tokens": 0}
+    searches_used = 0
+
+    for _round in range(_WEB_SEARCH_MAX_CONTINUATIONS_TAVILY + 1):
+        data = post_fn({**body, "messages": messages})
+        if usage := data.get("usage"):
+            agg_usage["input_tokens"] += usage.get("prompt_tokens", 0)
+            agg_usage["cached_tokens"] += usage.get("prompt_cache_hit_tokens", 0)
+            agg_usage["output_tokens"] += usage.get("completion_tokens", 0)
+
+        message = (data.get("choices") or [{}])[0].get("message") or {}
+        tool_calls = message.get("tool_calls") or []
+        web_calls = [tc for tc in tool_calls if (tc.get("function") or {}).get("name") == _TAVILY_TOOL_NAME]
+        other_calls = [tc for tc in tool_calls if (tc.get("function") or {}).get("name") != _TAVILY_TOOL_NAME]
+
+        if not web_calls:
+            # Final text, or real agent tool calls to hand back to the framework.
+            response, to_call, ni, __ = _parse_openai_compatible_response(
+                data, next_inputs, provider_label,
+            )
+            return response, to_call, ni, agg_usage
+
+        # Model asked to search: stitch the assistant turn + tool results in.
+        messages.append(message)
+        next_inputs.append(message)
+        for tc in web_calls:
+            try:
+                arguments = json.loads((tc.get("function") or {}).get("arguments") or "{}")
+            except json.JSONDecodeError:
+                arguments = {}
+            if searches_used < _WEB_SEARCH_MAX_USES_TAVILY:
+                result = _run_tavily_search(self.env, arguments.get("query") or "")
+                searches_used += 1
+                if result is None:  # key vanished mid-loop — treat as unavailable
+                    result = "Web search is currently unavailable."
+            else:
+                result = "Web search limit reached; answer with what you have."
+            tool_msg = {"role": "tool", "tool_call_id": tc.get("id"), "content": result}
+            messages.append(tool_msg)
+            next_inputs.append(tool_msg)
+
+        if other_calls:
+            # Real tools alongside the search: defer them to the framework. The
+            # web_search results are already stitched into next_inputs, so the
+            # continued turn stays protocol-valid (every tool_call answered).
+            to_call = _extract_openai_tool_calls(other_calls, provider_label)
+            return [], to_call, next_inputs, agg_usage
+
+        if searches_used >= _WEB_SEARCH_MAX_USES_TAVILY:
+            break  # hit the search ceiling; one more model turn would be capped
+
+    # Ran out of rounds / searches: ask the model once more for a final answer
+    # with search disabled so it cannot loop again.
+    final_body = {**body, "messages": messages}
+    final_body.pop("tools", None)
+    final_body.pop("tool_choice", None)
+    data = post_fn(final_body)
+    if usage := data.get("usage"):
+        agg_usage["input_tokens"] += usage.get("prompt_tokens", 0)
+        agg_usage["cached_tokens"] += usage.get("prompt_cache_hit_tokens", 0)
+        agg_usage["output_tokens"] += usage.get("completion_tokens", 0)
+    _logger.info(
+        "%s Tavily search hit its ceiling (%s searches); returning final answer",
+        provider_label, searches_used,
+    )
+    response, to_call, ni, __ = _parse_openai_compatible_response(data, next_inputs, provider_label)
+    return response, to_call, ni, agg_usage
+
+
+def _extract_openai_tool_calls(tool_calls, provider_label):
+    """Build the framework's ``to_call`` list from raw OpenAI tool_calls."""
+    to_call = []
+    for tc in tool_calls:
+        fn = tc.get("function") or {}
+        try:
+            arguments = json.loads(fn.get("arguments") or "{}")
+        except json.JSONDecodeError:
+            _logger.error("AI: Malformed arguments from %s: %s", provider_label, fn)
+            continue
+        to_call.append((fn.get("name"), tc.get("id"), arguments))
+    return to_call
+
+
+# ---------------------------------------------------------------------------
 # DeepSeek — OpenAI-compatible Chat Completions, hosted at api.deepseek.com
 # ---------------------------------------------------------------------------
 
@@ -575,30 +840,39 @@ def _request_llm_deepseek(
     files=None, schema=None, temperature=0.2, inputs=(), web_grounding=False,
 ):
     """DeepSeek (Chat Completions). Returns ``(response, to_call, next_inputs)``."""
-    _reject_unsupported("deepseek", files, schema, web_grounding)
+    _reject_unsupported("deepseek", files, schema)
 
     messages = _openai_compatible_messages(system_prompts, user_prompts, inputs)
     body = _openai_compatible_body(llm_model, messages, temperature, tools)
 
+    def _post(b):
+        return self._request(
+            method="post",
+            endpoint="/chat/completions",
+            headers=self._get_base_headers(),
+            body=b,
+        )
+
     with api_call_logging(messages, tools) as record_response:
-        response, to_call, next_inputs, request_token_usage = self._request_llm_deepseek_helper(body, inputs)
+        if web_grounding and _tavily_key(self.env):
+            response, to_call, next_inputs, usage = _openai_compatible_web_search_run(
+                self, body, inputs, "deepseek", _post,
+            )
+        else:
+            if web_grounding:
+                _logger.info(
+                    "deepseek: web search requested but no Tavily key is set; "
+                    "answering without it",
+                )
+            response, to_call, next_inputs, usage = _parse_openai_compatible_response(
+                _post(body), inputs, "deepseek",
+            )
         if record_response:
-            record_response(to_call, response, request_token_usage)
+            record_response(to_call, response, usage)
         return response, to_call, next_inputs
 
 
-def _request_llm_deepseek_helper(self, body, inputs=()):
-    data = self._request(
-        method="post",
-        endpoint="/chat/completions",
-        headers=self._get_base_headers(),
-        body=body,
-    )
-    return _parse_openai_compatible_response(data, inputs, "deepseek")
-
-
 LLMApiService._request_llm_deepseek = _request_llm_deepseek
-LLMApiService._request_llm_deepseek_helper = _request_llm_deepseek_helper
 
 
 # ---------------------------------------------------------------------------
@@ -613,45 +887,57 @@ def _request_llm_selfhosted(
     files=None, schema=None, temperature=0.2, inputs=(), web_grounding=False,
 ):
     """Self-Hosted (OpenAI-compatible). Returns ``(response, to_call, next_inputs)``."""
-    _reject_unsupported("selfhosted", files, schema, web_grounding)
+    _reject_unsupported("selfhosted", files, schema)
 
     messages = _openai_compatible_messages(system_prompts, user_prompts, inputs)
     body = _openai_compatible_body(llm_model, messages, temperature, tools)
 
+    def _post(b):
+        """Raw POST to the user's server, returning the parsed JSON dict.
+        Uses requests directly because the token may be empty (local Ollama)."""
+        headers = selfhosted_request_headers(self._get_api_token())
+        try:
+            resp = requests.post(
+                f"{self.base_url}/chat/completions",
+                headers=headers,
+                json=b,
+                timeout=120,
+            )
+            resp.raise_for_status()
+        except requests.RequestException as exc:
+            error = repr(exc)
+            if exc.response is not None:
+                try:
+                    error = exc.response.json().get("error", {}).get("message") or exc.response.text
+                except ValueError:
+                    error = exc.response.text
+            _logger.warning("Self-Hosted AI request failed (%s): %s", self.base_url, error)
+            raise UserError(_(
+                "Self-Hosted AI server returned an error: %s",
+                error,
+            ))
+        return resp.json()
+
     with api_call_logging(messages, tools) as record_response:
-        response, to_call, next_inputs, request_token_usage = self._request_llm_selfhosted_helper(body, inputs)
+        if web_grounding and _tavily_key(self.env):
+            response, to_call, next_inputs, usage = _openai_compatible_web_search_run(
+                self, body, inputs, "selfhosted", _post,
+            )
+        else:
+            if web_grounding:
+                _logger.info(
+                    "selfhosted: web search requested but no Tavily key is set; "
+                    "answering without it",
+                )
+            response, to_call, next_inputs, usage = _parse_openai_compatible_response(
+                _post(body), inputs, "selfhosted",
+            )
         if record_response:
-            record_response(to_call, response, request_token_usage)
+            record_response(to_call, response, usage)
         return response, to_call, next_inputs
 
 
-def _request_llm_selfhosted_helper(self, body, inputs=()):
-    headers = selfhosted_request_headers(self._get_api_token())
-    try:
-        resp = requests.post(
-            f"{self.base_url}/chat/completions",
-            headers=headers,
-            json=body,
-            timeout=120,
-        )
-        resp.raise_for_status()
-    except requests.RequestException as exc:
-        error = repr(exc)
-        if exc.response is not None:
-            try:
-                error = exc.response.json().get("error", {}).get("message") or exc.response.text
-            except ValueError:
-                error = exc.response.text
-        _logger.warning("Self-Hosted AI request failed (%s): %s", self.base_url, error)
-        raise UserError(_(
-            "Self-Hosted AI server returned an error: %s",
-            error,
-        ))
-    return _parse_openai_compatible_response(resp.json(), inputs, "selfhosted")
-
-
 LLMApiService._request_llm_selfhosted = _request_llm_selfhosted
-LLMApiService._request_llm_selfhosted_helper = _request_llm_selfhosted_helper
 
 
 # ---------------------------------------------------------------------------

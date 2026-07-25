@@ -127,17 +127,25 @@ _WEB_SEARCH_MAX_USES_TAVILY = _WEB_SEARCH_MAX_USES
 _WEB_SEARCH_MAX_CONTINUATIONS_TAVILY = _WEB_SEARCH_MAX_CONTINUATIONS
 
 
+# A trailing API-version path segment: /v1, /v4, /v1beta… Providers mount their
+# OpenAI-compatible API under different versions — Moonshot/DashScope/MiniMax use
+# /v1, Zhipu GLM uses /api/paas/v4 — so we must only auto-append /v1 when the URL
+# carries no version segment of its own (a bare host:port for local Ollama/vLLM).
+_API_VERSION_SEGMENT_RE = re.compile(r"/v\d+[a-z]*$", re.IGNORECASE)
+
+
 def normalize_selfhosted_url(raw):
     """Best-effort normalization of a user-entered server URL: strip
     whitespace and trailing slash, prepend ``http://`` when no scheme is
-    given, and append ``/v1`` when the path does not already end with
-    it. Returns an empty string if ``raw`` is falsy."""
+    given, and append ``/v1`` only when the URL has no API-version path
+    segment yet (so ``…/v4`` or ``…/compatible-mode/v1`` is left intact).
+    Returns an empty string if ``raw`` is falsy."""
     raw = (raw or "").strip().rstrip("/")
     if not raw:
         return ""
     if "://" not in raw:
         raw = "http://" + raw
-    if not raw.endswith("/v1"):
+    if not _API_VERSION_SEGMENT_RE.search(raw):
         raw = raw + "/v1"
     return raw
 

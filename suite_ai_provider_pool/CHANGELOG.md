@@ -3,6 +3,29 @@
 All notable changes to **AI Provider Pool** (`suite_ai_provider_pool`).
 This changelog starts at 1.5.0; earlier releases predate it.
 
+## [1.5.2] - 2026-07-25
+
+### Fixed
+- **OpenAI-compatible endpoints that don't mount their API under `/v1` now
+  work.** The Self-Hosted URL normaliser force-appended `/v1`, which broke
+  providers whose API lives under a different version path — notably Zhipu
+  GLM (`…/api/paas/v4`). The URL's own version segment (`/v1`, `/v4`,
+  `/compatible-mode/v1`) is now preserved; a bare `host:port` still gets
+  `/v1` appended as before.
+
+### Changed
+- **Docs: the "Self-Hosted" slot is documented as a general
+  OpenAI-compatible connector.** It has always accepted any
+  `/v1/chat/completions` endpoint; the manifest, Settings help and Apps
+  page now spell out the mainstream clouds it reaches — Moonshot Kimi,
+  Alibaba Qwen (Tongyi Qianwen / DashScope), MiniMax and Zhipu GLM — with
+  their base URLs, alongside the local engines (Ollama, vLLM, LM Studio).
+  One OpenAI-compatible endpoint is active at a time.
+- **Docs: corrected the web-search description.** The manifest still
+  described web search as Anthropic-only; it now reflects the 1.5.0
+  reality — a per-agent toggle where OpenAI, Gemini and Claude search
+  natively and DeepSeek / self-hosted use Tavily.
+
 ## [1.5.1] - 2026-07-24
 
 ### Fixed

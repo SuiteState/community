@@ -39,8 +39,8 @@
                     </div>
                 </setting>
                 <setting id="suite_selfhosted_provider"
-                         string="Connect a self-hosted LLM server"
-                         help="Run any open-source model on your own server (Ollama, vLLM, LM Studio) and use it from Odoo. OpenAI-compatible endpoints only."
+                         string="Connect a self-hosted or OpenAI-compatible LLM"
+                         help="Point Odoo at any OpenAI-compatible endpoint: a model on your own server (Ollama, vLLM, LM Studio) or a cloud provider such as Moonshot Kimi, Alibaba Qwen, MiniMax or Zhipu GLM. Set the URL and key, then Fetch or type the model names. One endpoint at a time."
                          groups="base.group_system">
                     <div class="content-group">
                         <div class="row mt8">

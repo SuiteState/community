@@ -71,11 +71,14 @@ class ResConfigSettings(models.TransientModel):
         string="Self-Hosted Server URL",
         config_parameter="ai.selfhosted_url",
         help=(
-            "Base URL of an OpenAI-compatible inference server: Ollama, "
-            "vLLM, LM Studio, or any other endpoint that exposes "
-            "/v1/chat/completions. The /v1 suffix is added automatically "
-            "if you only type host:port. Examples: "
-            "http://localhost:11434, http://192.168.1.10:8000."
+            "Base URL of any OpenAI-compatible endpoint that exposes "
+            "/v1/chat/completions — self-hosted (Ollama, vLLM, LM Studio) "
+            "or a cloud provider (Moonshot Kimi, Alibaba Qwen, MiniMax, "
+            "Zhipu GLM). Typing host:port is enough — /v1 is appended "
+            "automatically; a URL that already carries its own version "
+            "path (…/v1, …/paas/v4) is used as-is. Examples: "
+            "http://localhost:11434, https://api.moonshot.cn/v1, "
+            "https://open.bigmodel.cn/api/paas/v4."
         ),
     )
     suite_selfhosted_key = fields.Char(

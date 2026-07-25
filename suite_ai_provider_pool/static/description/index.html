@@ -3,9 +3,11 @@
 <h1 style="text-align:center;">AI Provider Pool</h1>
 
 <h3 style="text-align:center; color:#555;">
-Adds Anthropic Claude, DeepSeek, and any self-hosted OpenAI-compatible
-LLM as native AI providers in Odoo 19 Enterprise &mdash; with automatic
-embedding fallback and configurable AI automation model.
+Adds Anthropic Claude, DeepSeek, and any OpenAI-compatible LLM &mdash;
+self-hosted (Ollama, vLLM, LM Studio) or cloud (Kimi, Qwen, MiniMax,
+Zhipu GLM) &mdash; as native AI providers in Odoo 19 Enterprise, with
+web search, automatic embedding fallback and a configurable AI
+automation model.
 </h3>
 
 <hr/>
@@ -35,14 +37,33 @@ and V4 Flash models. Optional web search via Tavily (see below). API
 key configured per database or via <code>ODOO_AI_DEEPSEEK_TOKEN</code>.
 </p>
 
-<h3>Self-Hosted (OpenAI-compatible)</h3>
+<h3>Self-Hosted &amp; OpenAI-compatible cloud</h3>
 <p>
-Any endpoint exposing <code>/v1/chat/completions</code> &mdash;
-Ollama, vLLM, LM Studio, HuggingFace TGI, or a custom deployment.
-Type <code>host:port</code> and the <code>/v1</code> suffix is
-added automatically. API key is optional, suitable for local
-installs without authentication.
+One slot connects <strong>any</strong> endpoint exposing
+<code>/v1/chat/completions</code> &mdash; whether self-hosted
+(Ollama, vLLM, LM Studio, HuggingFace TGI) or an OpenAI-compatible
+cloud provider. Point the URL at the endpoint, set the key, add the
+model names. Type <code>host:port</code> and the <code>/v1</code>
+suffix is added automatically; a URL with its own version path
+(<code>/v1</code>, <code>/paas/v4</code>) is used as-is. API key is
+optional for local installs without authentication. One endpoint is
+active at a time.
 </p>
+<p>Mainstream OpenAI-compatible clouds it connects to, for example:</p>
+<ul>
+    <li><strong>Moonshot Kimi</strong> &mdash;
+        <code>https://api.moonshot.cn/v1</code> (kimi-k2, moonshot-v1-*)</li>
+    <li><strong>Alibaba Qwen / Tongyi Qianwen</strong> (DashScope
+        compatible mode) &mdash;
+        <code>https://dashscope.aliyuncs.com/compatible-mode/v1</code>
+        (qwen-max, qwen-plus, qwen-turbo, qwen3-*)</li>
+    <li><strong>MiniMax</strong> &mdash;
+        <code>https://api.minimax.io/v1</code> (MiniMax-M series; open
+        weights are also self-hostable on vLLM)</li>
+    <li><strong>Zhipu GLM</strong> &mdash;
+        <code>https://open.bigmodel.cn/api/paas/v4</code> (glm-4.6,
+        glm-4-plus)</li>
+</ul>
 
 <ul>
     <li><strong>Fetch Available Models</strong> &mdash; one-click

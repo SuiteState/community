@@ -31,7 +31,7 @@ class AiAgent(models.Model):
             "Let this agent search the web when answering. Odoo has no built-in "
             "toggle for this — the Provider Pool wires it for every provider: "
             "OpenAI and Gemini use their native web search, Claude uses its "
-            "server-side search, and DeepSeek / self-hosted models use Tavily "
+            "server-side search, and DeepSeek / Custom LLM models use Tavily "
             "(set a Tavily API key in Settings → AI). OpenAI and Tavily "
             "results are localized to your company's country automatically. "
             "Gemini cannot combine web search with tools, so it is skipped "

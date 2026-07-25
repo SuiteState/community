@@ -98,10 +98,10 @@ anything locally.
 
 **Steps**
 
-1. **Settings → AI → Self-Hosted (OpenAI-compatible)** block.
+1. **Settings → AI → Connect a Custom LLM (self-hosted or cloud)** block.
 2. Fill in:
    - **Server URL**: `https://api.deepseek.com`
-   - **API Key**: your DeepSeek key (paste into the *Self-Hosted* key
+   - **API Key**: your DeepSeek key (paste into the *LLM API Key*
      field, not the DeepSeek field).
    - Leave **Custom Models** empty for now.
 3. Click **Test Connection**.
@@ -114,7 +114,7 @@ anything locally.
 
 **Expected**
 
-- [ ] Test Connection toast: `Self-Hosted AI connection OK. Reached
+- [ ] Test Connection toast: `Custom LLM connection OK. Reached
       https://api.deepseek.com/v1, N model(s) available.`
 - [ ] Fetch Available Models toast: `Added N new model(s) ...`.
 - [ ] After Save, the fetched DeepSeek model identifiers appear in
@@ -156,7 +156,7 @@ curl http://localhost:11434/v1/models
 
 **Steps**
 
-1. **Settings → AI → Self-Hosted** block.
+1. **Settings → AI → Connect a Custom LLM** block.
 2. Fill in:
    - **Server URL**: e.g. `localhost:11434` (no `http://`, no `/v1` —
      verifies the smart normalizer).
@@ -203,7 +203,7 @@ open-source models.
 
 **Steps**
 
-1. **Settings → AI → Self-Hosted** block.
+1. **Settings → AI → Connect a Custom LLM** block.
 2. Fill in:
    - **Server URL**: `https://api.groq.com/openai/v1`
      (note: Groq's path is `/openai/v1`, not just `/v1` — type the
@@ -237,7 +237,7 @@ Ollama from Scenario 4):
 - [ ] `http://localhost:11434/v1` → works
 - [ ] `http://localhost:11434/v1/` → works
 - [ ] empty string → button raises a clear `Fill in the
-      Self-Hosted Server URL first.` error
+      LLM Server URL first.` error
 
 ### Bad endpoint
 
@@ -259,11 +259,11 @@ Ollama from Scenario 4):
       fetched from → toast says `No new models — all N model(s) ...
       are already in the list.`
 
-### Self-Hosted without configuration
+### Custom LLM without configuration
 
 - [ ] Clear the Server URL field, Save. Open an agent that was using
-      a Self-Hosted model and try to chat → expect the user-facing
-      error: `Self-Hosted AI server URL is not configured. Open
+      a Custom LLM model and try to chat → expect the user-facing
+      error: `Custom LLM server URL is not configured. Open
       Settings → AI and fill in the Server URL.`
 
 ---

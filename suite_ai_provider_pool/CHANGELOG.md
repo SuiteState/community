@@ -3,6 +3,27 @@
 All notable changes to **AI Provider Pool** (`suite_ai_provider_pool`).
 This changelog starts at 1.5.0; earlier releases predate it.
 
+## [1.5.3] - 2026-07-25
+
+### Changed
+- **Renamed the "Self-Hosted" provider to "Custom LLM" across the UI.**
+  The slot has always accepted any OpenAI-compatible endpoint — local or
+  cloud — but the "Self-Hosted" label implied it only worked with a model
+  running on your own server. The provider (dropdown group, Settings block)
+  now reads **Custom LLM**, and its three fields are renamed for clarity:
+  **LLM Server URL**, **LLM API Key** and **LLM Models**. All three describe
+  the same single endpoint; the field help and the Apps page now spell out
+  that self-hosted vs cloud differs only in what you type (URL, whether a key
+  is needed), not which fields you use. This touches only display text. The
+  stored parameters (`ai.selfhosted_url`, `ai.selfhosted_key`,
+  `ai.selfhosted_models`) and the `ODOO_AI_SELFHOSTED_TOKEN` environment
+  variable are unchanged, so existing configurations keep working with no
+  migration.
+- **Docs: added Moonshot Kimi K3 as an example model** (`kimi-k3`, released
+  2026-07-16) and listed both Moonshot base URLs — `https://api.moonshot.ai/v1`
+  (international) and `https://api.moonshot.cn/v1` (China). No code change:
+  K3 is OpenAI-compatible and already reachable through the Custom LLM slot.
+
 ## [1.5.2] - 2026-07-25
 
 ### Fixed

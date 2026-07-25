@@ -8,7 +8,7 @@
             <xpath expr="//block[@name='ai_providers']" position="inside">
                 <setting id="suite_server_action_model"
                          string="AI Automation Model"
-                         help="Model for Odoo's built-in AI automations (server actions / rules flagged 'AI', document sorting) — NOT the chatbot; AI Agents and the WhatsApp AI keep their own model. Odoo defaults to OpenAI GPT-4.1; set this to use Claude, DeepSeek or self-hosted. Leave empty to keep the default (needs an OpenAI key)."
+                         help="Model for Odoo's built-in AI automations (server actions / rules flagged 'AI', document sorting) — NOT the chatbot; AI Agents and the WhatsApp AI keep their own model. Odoo defaults to OpenAI GPT-4.1; set this to use Claude, DeepSeek or a Custom LLM. Leave empty to keep the default (needs an OpenAI key)."
                          groups="base.group_system">
                     <div class="flex-grow-1">
                         <field name="suite_server_action_model" nolabel="1" class="w-50"/>
@@ -31,16 +31,16 @@
                     </div>
                 </setting>
                 <setting id="suite_tavily_provider"
-                         string="Web search for DeepSeek / self-hosted (Tavily)"
-                         help="Optional. OpenAI, Gemini and Claude search the web natively; DeepSeek and self-hosted models don't, so they use Tavily. Set the key here, then turn on 'Search the Web' on the AI Agent. Results are localized to your company's country."
+                         string="Web search for DeepSeek / Custom LLM (Tavily)"
+                         help="Optional. OpenAI, Gemini and Claude search the web natively; DeepSeek and Custom LLM models don't, so they use Tavily. Set the key here, then turn on 'Search the Web' on the AI Agent. Results are localized to your company's country."
                          groups="base.group_system">
                     <div class="flex-grow-1">
                         <field name="suite_tavily_key" placeholder="Key" password="True" nolabel="1" class="w-100"/>
                     </div>
                 </setting>
                 <setting id="suite_selfhosted_provider"
-                         string="Connect a self-hosted or OpenAI-compatible LLM"
-                         help="Point Odoo at any OpenAI-compatible endpoint: a model on your own server (Ollama, vLLM, LM Studio) or a cloud provider such as Moonshot Kimi, Alibaba Qwen, MiniMax or Zhipu GLM. Set the URL and key, then Fetch or type the model names. One endpoint at a time."
+                         string="Connect a Custom LLM (self-hosted or cloud)"
+                         help="Connect any OpenAI-compatible LLM by its endpoint URL — self-hosted (Ollama, vLLM, LM Studio on your own server) or cloud (Moonshot Kimi, Alibaba Qwen, MiniMax, Zhipu GLM). Set the URL and key, then Fetch or type the model names. One endpoint at a time."
                          groups="base.group_system">
                     <div class="content-group">
                         <div class="row mt8">

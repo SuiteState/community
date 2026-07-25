@@ -37,7 +37,7 @@ and V4 Flash models. Optional web search via Tavily (see below). API
 key configured per database or via <code>ODOO_AI_DEEPSEEK_TOKEN</code>.
 </p>
 
-<h3>Self-Hosted &amp; OpenAI-compatible cloud</h3>
+<h3>Custom LLM &mdash; self-hosted &amp; OpenAI-compatible cloud</h3>
 <p>
 One slot connects <strong>any</strong> endpoint exposing
 <code>/v1/chat/completions</code> &mdash; whether self-hosted
@@ -49,10 +49,32 @@ suffix is added automatically; a URL with its own version path
 optional for local installs without authentication. One endpoint is
 active at a time.
 </p>
+<p>
+The slot has three fields, and all three describe the <strong>same one
+endpoint</strong> &mdash; the difference between self-hosted and cloud is
+only <em>what you type in them</em>, not which fields you use:
+</p>
+<ul>
+    <li><strong>LLM Server URL</strong> &mdash; where the endpoint lives.
+        Filled in <strong>both</strong> cases: your own server
+        (<code>http://localhost:11434</code>) for self-hosted, or the
+        provider's base URL (<code>https://api.moonshot.ai/v1</code>) for
+        a cloud model.</li>
+    <li><strong>LLM API Key</strong> &mdash; the bearer token that
+        authenticates against that URL. Leave empty for a local engine
+        with no auth (e.g. Ollama); required for cloud providers and for
+        any self-hosted server that enforces a token.</li>
+    <li><strong>LLM Models</strong> &mdash; the model identifiers that
+        endpoint serves (e.g. <code>kimi-k3</code>, <code>qwen2.5:14b</code>).
+        They appear in the AI Agent model selector. Type them or click
+        <strong>Fetch Available Models</strong> to pull the list.</li>
+</ul>
 <p>Mainstream OpenAI-compatible clouds it connects to, for example:</p>
 <ul>
     <li><strong>Moonshot Kimi</strong> &mdash;
-        <code>https://api.moonshot.cn/v1</code> (kimi-k2, moonshot-v1-*)</li>
+        <code>https://api.moonshot.ai/v1</code> (international) or
+        <code>https://api.moonshot.cn/v1</code> (China) &mdash;
+        (kimi-k3, kimi-k2, moonshot-v1-*)</li>
     <li><strong>Alibaba Qwen / Tongyi Qianwen</strong> (DashScope
         compatible mode) &mdash;
         <code>https://dashscope.aliyuncs.com/compatible-mode/v1</code>
@@ -174,7 +196,7 @@ in the same section as the native OpenAI and Gemini providers:</p>
     <li><strong>API keys</strong> &mdash; per database, stored as system
         parameters. Also readable from environment variables for
         containerized deployments.</li>
-    <li><strong>Self-Hosted URL</strong> &mdash; auto-completed from
+    <li><strong>LLM Server URL</strong> &mdash; auto-completed from
         <code>host:port</code> input.</li>
     <li><strong>Custom model list</strong> &mdash; manually entered or
         fetched from the server's <code>/v1/models</code> endpoint.</li>
@@ -302,8 +324,8 @@ company's country automatically (OpenAI adds your city too).
             <td style="padding:10px 12px; border:1px solid #ddd;">These models have no native web search, so the module runs the search itself through <strong>Tavily</strong>: add a Tavily API key in Settings &rarr; AI and the model gains a search tool it can call. Without a key it simply answers without searching.</td>
         </tr>
         <tr>
-            <td style="padding:10px 12px; border:1px solid #ddd;"><strong>Self-hosted</strong></td>
-            <td style="padding:10px 12px; border:1px solid #ddd;">Same as DeepSeek &mdash; web search via a Tavily key, since open-source chat servers ship no search of their own.</td>
+            <td style="padding:10px 12px; border:1px solid #ddd;"><strong>Custom LLM</strong></td>
+            <td style="padding:10px 12px; border:1px solid #ddd;">Same as DeepSeek &mdash; web search via a Tavily key, since self-hosted and OpenAI-compatible chat servers ship no search of their own.</td>
         </tr>
     </tbody>
 </table>
@@ -327,7 +349,7 @@ the best available option.
         providers, or a reachable self-hosted endpoint.</li>
     <li><strong>For Knowledge Sources:</strong> an additional OpenAI or
         Google API key for embedding (only needed when using Claude,
-        DeepSeek, or Self-Hosted as the chat model).</li>
+        DeepSeek, or a Custom LLM as the chat model).</li>
     <li><strong>For web search on DeepSeek / self-hosted:</strong> an
         optional Tavily API key (OpenAI, Gemini and Claude search
         natively without one).</li>

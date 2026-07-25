@@ -62,7 +62,7 @@ SELFHOSTED_DEFAULT_MODELS = [
 
 SELFHOSTED = Provider(
     name="selfhosted",
-    display_name="Self-Hosted (OpenAI-compatible)",
+    display_name="Custom LLM (OpenAI-compatible)",
     embedding_model="",
     embedding_config={},
     llms=list(SELFHOSTED_DEFAULT_MODELS),

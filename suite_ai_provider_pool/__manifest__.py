@@ -19,7 +19,7 @@ Providers
 ---------
 - Anthropic Claude (Messages API) with tool calling and web search.
 - DeepSeek (Chat Completions API) with function calling.
-- OpenAI-compatible endpoint (the "Self-Hosted" slot) — connect ANY
+- Custom LLM (the "Custom LLM" slot) — connect ANY OpenAI-compatible
   server or cloud that exposes /v1/chat/completions, with function
   calling. This one slot covers both self-hosted engines (Ollama, vLLM,
   LM Studio, HuggingFace TGI) and OpenAI-compatible cloud providers.
@@ -32,7 +32,8 @@ Compatible cloud providers (examples)
 -------------------------------------
 Any endpoint that speaks the OpenAI Chat Completions format works. A few
 mainstream ones and their base URLs:
-- Moonshot Kimi — https://api.moonshot.cn/v1 (kimi-k2, moonshot-v1-*)
+- Moonshot Kimi — https://api.moonshot.ai/v1 (international) or
+  https://api.moonshot.cn/v1 (China) — (kimi-k3, kimi-k2, moonshot-v1-*)
 - Alibaba Qwen / Tongyi Qianwen (DashScope compatible mode) —
   https://dashscope.aliyuncs.com/compatible-mode/v1 (qwen-max, qwen-plus,
   qwen-turbo, qwen3-*)
@@ -50,8 +51,8 @@ Configuration
 - Server URL is auto-completed: typing host:port is enough and the /v1
   suffix is added automatically, while a full URL that already carries its
   own version path (…/v1, …/paas/v4) is used as-is.
-- Custom Self-Hosted models can be discovered with one click via the
-  Fetch Available Models button (calls /v1/models on the server).
+- Custom LLM models can be discovered with one click via the
+  Fetch Available Models button (calls /v1/models on the endpoint).
 - A Test Connection button verifies reachability before going live.
 - Multi-company safe: keys and URLs are stored as system parameters.
 
@@ -91,7 +92,7 @@ Limitations
   supported for the new providers. Use OpenAI or Gemini for those.
 - Web search on DeepSeek and self-hosted / OpenAI-compatible models
   needs a Tavily API key (OpenAI, Gemini and Claude search natively).
-- Only one OpenAI-compatible endpoint (the "Self-Hosted" slot) can be
+- Only one OpenAI-compatible endpoint (the "Custom LLM" slot) can be
   active at a time; connect Kimi or Qwen or MiniMax or GLM, not several
   at once.
 - AI Field Fill remains OpenAI-only due to Odoo's use of the
@@ -99,7 +100,7 @@ Limitations
 
 License: LGPL-3.
 """,
-    "version": "19.0.1.5.2",
+    "version": "19.0.1.5.3",
     "category": "Productivity/AI",
     "license": "LGPL-3",
     "author": "SuiteState",

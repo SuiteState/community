@@ -157,7 +157,7 @@ def _resolve_selfhosted_base_url(env):
     base_url = normalize_selfhosted_url(raw)
     if not base_url:
         raise UserError(_(
-            "Self-Hosted AI server URL is not configured. "
+            "Custom LLM server URL is not configured. "
             "Open Settings → AI and fill in the Server URL."
         ))
     return base_url
@@ -920,9 +920,9 @@ def _request_llm_selfhosted(
                     error = exc.response.json().get("error", {}).get("message") or exc.response.text
                 except ValueError:
                     error = exc.response.text
-            _logger.warning("Self-Hosted AI request failed (%s): %s", self.base_url, error)
+            _logger.warning("Custom LLM request failed (%s): %s", self.base_url, error)
             raise UserError(_(
-                "Self-Hosted AI server returned an error: %s",
+                "Custom LLM server returned an error: %s",
                 error,
             ))
         return resp.json()

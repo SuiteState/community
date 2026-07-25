@@ -68,34 +68,34 @@ class ResConfigSettings(models.TransientModel):
         ),
     )
     suite_selfhosted_url = fields.Char(
-        string="Self-Hosted Server URL",
+        string="LLM Server URL",
         config_parameter="ai.selfhosted_url",
         help=(
             "Base URL of any OpenAI-compatible endpoint that exposes "
-            "/v1/chat/completions — self-hosted (Ollama, vLLM, LM Studio) "
-            "or a cloud provider (Moonshot Kimi, Alibaba Qwen, MiniMax, "
-            "Zhipu GLM). Typing host:port is enough — /v1 is appended "
-            "automatically; a URL that already carries its own version "
-            "path (…/v1, …/paas/v4) is used as-is. Examples: "
-            "http://localhost:11434, https://api.moonshot.cn/v1, "
+            "/v1/chat/completions. Two kinds of endpoint work: self-hosted "
+            "(Ollama, vLLM, LM Studio on your own server) or cloud (Moonshot "
+            "Kimi, Alibaba Qwen, MiniMax, Zhipu GLM). Typing host:port is "
+            "enough — /v1 is appended automatically; a URL that already "
+            "carries its own version path (…/v1, …/paas/v4) is used as-is. "
+            "Examples: http://localhost:11434, https://api.moonshot.cn/v1, "
             "https://open.bigmodel.cn/api/paas/v4."
         ),
     )
     suite_selfhosted_key = fields.Char(
-        string="Self-Hosted API Key",
+        string="LLM API Key",
         config_parameter="ai.selfhosted_key",
         help=(
-            "Optional bearer token for servers that require authentication. "
-            "Leave empty for local Ollama instances without auth. "
-            "If the environment variable ODOO_AI_SELFHOSTED_TOKEN is set, "
-            "it overrides this value."
+            "Optional bearer token for endpoints that require authentication. "
+            "Leave empty for local engines without auth (e.g. Ollama); set it "
+            "for cloud providers. If the environment variable "
+            "ODOO_AI_SELFHOSTED_TOKEN is set, it overrides this value."
         ),
     )
     suite_tavily_key = fields.Char(
         string="Tavily API Key",
         config_parameter="ai.tavily_key",
         help=(
-            "Optional. Enables web search for DeepSeek and self-hosted models "
+            "Optional. Enables web search for DeepSeek and Custom LLM models "
             "(which have no built-in search) via Tavily. Get a key at "
             "tavily.com. Not needed for OpenAI, Gemini or Claude, which search "
             "natively. Results are localized to your company's country. "
@@ -111,8 +111,8 @@ class ResConfigSettings(models.TransientModel):
             "Model for Odoo's built-in AI automations (server actions / "
             "rules flagged 'AI', document sorting) — NOT the chatbot; AI "
             "Agents and the WhatsApp AI keep their own model. Odoo defaults "
-            "to OpenAI GPT-4.1; set this to use Claude, DeepSeek or "
-            "self-hosted. Leave empty to keep the default (needs an OpenAI key)."
+            "to OpenAI GPT-4.1; set this to use Claude, DeepSeek or a "
+            "Custom LLM. Leave empty to keep the default (needs an OpenAI key)."
         ),
     )
 
@@ -125,14 +125,14 @@ class ResConfigSettings(models.TransientModel):
         return selection
 
     suite_selfhosted_models = fields.Text(
-        string="Self-Hosted Custom Models",
+        string="LLM Models",
         help=(
             "Additional model identifiers exposed in the AI Agent model "
             "selector, one per line. Use the format expected by your "
-            "server (e.g. 'qwen2.5:14b' for Ollama). Add '| Display Name' "
-            "after the identifier to set a friendly label. Use the "
-            "Fetch Available Models button to populate this list "
-            "automatically."
+            "endpoint (e.g. 'qwen2.5:14b' for Ollama, 'kimi-k3' for "
+            "Moonshot). Add '| Display Name' after the identifier to set a "
+            "friendly label. Use the Fetch Available Models button to "
+            "populate this list automatically."
         ),
     )
 
@@ -180,7 +180,7 @@ class ResConfigSettings(models.TransientModel):
         self.ensure_one()
         base_url = normalize_selfhosted_url(self.suite_selfhosted_url)
         if not base_url:
-            raise UserError(_("Fill in the Self-Hosted Server URL first."))
+            raise UserError(_("Fill in the LLM Server URL first."))
         headers = selfhosted_request_headers(self.suite_selfhosted_key or "")
         try:
             resp = requests.get(
@@ -226,7 +226,7 @@ class ResConfigSettings(models.TransientModel):
             "tag": "display_notification",
             "params": {
                 "type": "success",
-                "title": _("Self-Hosted AI connection OK"),
+                "title": _("Custom LLM connection OK"),
                 "message": _(
                     "Reached %(url)s, %(count)d model(s) available.",
                     url=base_url,
@@ -264,7 +264,7 @@ class ResConfigSettings(models.TransientModel):
             "tag": "display_notification",
             "params": {
                 "type": notif_type,
-                "title": _("Self-Hosted models fetched"),
+                "title": _("Custom LLM models fetched"),
                 "message": message,
                 "sticky": False,
             },

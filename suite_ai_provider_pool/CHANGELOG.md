@@ -3,6 +3,27 @@
 All notable changes to **AI Provider Pool** (`suite_ai_provider_pool`).
 This changelog starts at 1.5.0; earlier releases predate it.
 
+## [1.5.4] - 2026-08-31
+
+### Fixed
+- **Registry crash under a newer Odoo 19 point release.** Odoo added a required
+  field (`response_style_to_llm_model_and_reasoning`) to the `Provider`
+  NamedTuple. The provider registration built `Provider(...)` with a fixed
+  argument list, so the missing field raised `TypeError` at import — which
+  aborts module loading and takes the whole database registry down (500 on
+  boot). The three providers now pass the field explicitly.
+
+### Changed
+- **Provider registration is now resilient to upstream field changes.**
+  Providers are built through a `_make_provider(...)` factory that fills any
+  Provider field the running Odoo declares but we did not pass (an upstream
+  *addition*) with a type-appropriate empty value, and drops kwargs that are no
+  longer fields (an upstream *removal*) — each with a logged `WARNING`. A future
+  required-field addition can no longer crash the registry; the module boots and
+  flags the change for review instead. Safe because our transport reads only
+  name/display_name/embedding_model/llms/deprecated_models; all other Provider
+  fields are consumed by upstream's own guarded, provider-specific paths.
+
 ## [1.5.3] - 2026-07-25
 
 ### Changed

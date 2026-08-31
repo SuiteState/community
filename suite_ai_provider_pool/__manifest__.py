@@ -100,7 +100,7 @@ Limitations
 
 License: LGPL-3.
 """,
-    "version": "19.0.1.5.3",
+    "version": "19.0.1.5.4",
     "category": "Productivity/AI",
     "license": "LGPL-3",
     "author": "SuiteState",

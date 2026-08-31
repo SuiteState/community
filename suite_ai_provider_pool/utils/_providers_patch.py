@@ -11,9 +11,90 @@ administrator saves new custom model identifiers in AI Settings — see
 ``models/res_config_settings.py``.
 """
 
+import logging
+import typing
+
 from odoo.addons.ai.utils.llm_providers import PROVIDERS, Provider
 
-ANTHROPIC = Provider(
+_logger = logging.getLogger(__name__)
+
+# ``response_style_to_llm_model_and_reasoning`` (added to Provider in Odoo 19) is
+# a style -> (replacement_model, reasoning) map read ONLY behind a
+# ``llm_model in provider.deprecated_models`` guard
+# (llm_providers.get_llm_model_and_reasoning / get_deprecated_model_replacement_label).
+# Our providers carry no deprecated_models, so it is never indexed for us and an
+# empty mapping is the correct, side-effect-free value. Passed explicitly (below)
+# so ``_make_provider`` does NOT treat it as an unknown field and warn on it.
+_NO_DEPRECATION_REDIRECT = {}
+
+
+def _empty_for(annotation):
+    """A type-appropriate empty value for a Provider field we don't set.
+
+    Prefer ``{}`` / ``[]`` / ``""`` (matching the field's annotation) over
+    ``None`` so upstream code that reads the field tolerantly — ``for x in
+    field``, ``field.get(k)``, ``if field:`` — keeps working; only a hard
+    ``field[k]`` / ``field.attr`` on a never-populated field would still fail,
+    and that is a LOUD runtime error, not a silent one. Unknown types fall back
+    to ``None``.
+    """
+    origin = typing.get_origin(annotation) or annotation
+    return {
+        dict: {}, list: [], tuple: (), set: set(),
+        str: "", int: 0, float: 0.0, bool: False,
+    }.get(origin, None)
+
+
+def _make_provider(**kwargs):
+    """Construct ``ai...Provider`` resiliently across 19.x point releases.
+
+    Odoo has already added a *required* field to this NamedTuple between point
+    releases (``response_style_to_llm_model_and_reasoning``). Constructing it
+    with a fixed argument list means the NEXT such addition raises ``TypeError``
+    at import and takes the WHOLE registry — every module, every user — down,
+    merely to register a few chat providers. This factory builds the tuple from
+    whatever fields the *running* Odoo declares:
+
+    * fields we pass explicitly are used as-is;
+    * a field the running Odoo declares but we did NOT pass (an upstream
+      *addition*) is filled with ``_empty_for`` and logged as a WARNING, so the
+      instance still boots while flagging that someone should check whether our
+      providers need a real value;
+    * a kwarg that is no longer a Provider field (an upstream *removal*) is
+      dropped, also with a WARNING.
+
+    Safe for us because our transport reads only name / display_name /
+    embedding_model / llms / deprecated_models; every other Provider field is
+    consumed by upstream's own guarded, provider-specific paths. An empty value
+    could only ever matter if a future field were read UNCONDITIONALLY on every
+    provider in ``PROVIDERS`` — the WARNING is the tripwire for exactly that.
+    """
+    fields = Provider._fields
+    annotations = getattr(Provider, "__annotations__", {})
+
+    removed = sorted(k for k in kwargs if k not in fields)
+    if removed:
+        _logger.warning(
+            "suite_ai_provider_pool: Provider no longer declares %s — dropping "
+            "(upstream removed it?). Review utils/_providers_patch.py.",
+            ", ".join(removed),
+        )
+
+    values = {}
+    for name in fields:
+        if name in kwargs:
+            values[name] = kwargs[name]
+            continue
+        values[name] = _empty_for(annotations.get(name))
+        _logger.warning(
+            "suite_ai_provider_pool: upstream added Provider field %r — filled "
+            "with %r to keep the registry loading. Review whether our providers "
+            "need a real value.", name, values[name],
+        )
+    return Provider(**values)
+
+
+ANTHROPIC = _make_provider(
     name="anthropic",
     display_name="Anthropic Claude",
     embedding_model="",
@@ -26,9 +107,10 @@ ANTHROPIC = Provider(
         ("claude-haiku-4-5", "Claude Haiku 4.5"),
     ],
     deprecated_models=[],
+    response_style_to_llm_model_and_reasoning=_NO_DEPRECATION_REDIRECT,
 )
 
-DEEPSEEK = Provider(
+DEEPSEEK = _make_provider(
     name="deepseek",
     display_name="DeepSeek",
     embedding_model="",
@@ -42,6 +124,7 @@ DEEPSEEK = Provider(
         ("deepseek-v4-flash", "DeepSeek V4 Flash"),
     ],
     deprecated_models=[],
+    response_style_to_llm_model_and_reasoning=_NO_DEPRECATION_REDIRECT,
 )
 
 # Curated defaults for Self-Hosted. Tags follow the conventions of Ollama,
@@ -60,13 +143,14 @@ SELFHOSTED_DEFAULT_MODELS = [
     ("phi4", "Phi-4"),
 ]
 
-SELFHOSTED = Provider(
+SELFHOSTED = _make_provider(
     name="selfhosted",
     display_name="Custom LLM (OpenAI-compatible)",
     embedding_model="",
     embedding_config={},
     llms=list(SELFHOSTED_DEFAULT_MODELS),
     deprecated_models=[],
+    response_style_to_llm_model_and_reasoning=_NO_DEPRECATION_REDIRECT,
 )
 
 

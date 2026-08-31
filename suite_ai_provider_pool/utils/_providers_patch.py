@@ -26,6 +26,7 @@ ANTHROPIC = Provider(
         ("claude-haiku-4-5", "Claude Haiku 4.5"),
     ],
     deprecated_models=[],
+    response_style_to_llm_model_and_reasoning={},
 )
 
 DEEPSEEK = Provider(
@@ -38,6 +39,7 @@ DEEPSEEK = Provider(
         ("deepseek-reasoner", "DeepSeek R1 (Reasoner)"),
     ],
     deprecated_models=[],
+    response_style_to_llm_model_and_reasoning={},
 )
 
 # Curated defaults for Self-Hosted. Tags follow the conventions of Ollama,
@@ -63,6 +65,7 @@ SELFHOSTED = Provider(
     embedding_config={},
     llms=list(SELFHOSTED_DEFAULT_MODELS),
     deprecated_models=[],
+    response_style_to_llm_model_and_reasoning={},
 )
 
 
